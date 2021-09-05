@@ -1,11 +1,9 @@
 /* See LICENSE file for copyright and license details. */
 #include "common.h"
 
-#define UNICODE_MINUS "−"
-
 
 ssize_t
-libnumtext_num2text(char outbuf[], size_t outbuf_size, const char *num, size_t num_len,
+libnumtext_num2text(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                     enum libnumtext_language lang, uint32_t flags, ...)
 {
 	size_t i;

@@ -54,10 +54,10 @@ enum libnumtext_language {
 
 
 /* input to libnumtext_num2str may not contain separators */
-ssize_t libnumtext_remove_separators(char outbuf[], size_t outbuf_size, const char *num, size_t num_len,
+ssize_t libnumtext_remove_separators(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                                      enum libnumtext_language lang);
 
-ssize_t libnumtext_num2text(char outbuf[], size_t outbuf_size, const char *num, size_t num_len,
+ssize_t libnumtext_num2text(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                             enum libnumtext_language lang, uint32_t flags, ...);
 
 

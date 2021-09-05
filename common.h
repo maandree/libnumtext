@@ -2,7 +2,27 @@
 #include "libnumtext.h"
 #include <ctype.h>
 #include <errno.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
-ssize_t libnumtext_num2text_swedish__(char outbuf[], size_t outbuf_size, const char *num, size_t num_len, uint32_t flags);
+#if defined(__clang__)
+# pragma clang diagnostic ignored "-Wcovered-switch-default"
+# pragma clang diagnostic ignored "-Wpadded"
+#endif
+
+
+#if defined(__clang__)
+# define FALL_THROUGH __attribute__((fallthrough));
+#else
+# define FALL_THROUGH
+#endif
+
+
+#define UNICODE_MINUS "−"
+
+
+ssize_t libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags);

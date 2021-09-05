@@ -3,7 +3,7 @@
 
 
 ssize_t
-libnumtext_remove_separators(char outbuf[], size_t outbuf_size, const char *num, size_t num_len, enum libnumtext_language lang)
+libnumtext_remove_separators(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, enum libnumtext_language lang)
 {
 	char *p = outbuf;
 	ssize_t len = 0;
