@@ -38,13 +38,13 @@ static struct ten {
 	{NULL},
 	{NULL},
 	{"Tju¦go",   "Tju¦gon"},
-	{"Tret|tio", "Tret|ti¦on"},
-	{"Fyr|tio",  "Fyr|ti¦on"},
-	{"Fem|tio",  "Fem|ti¦on"},
-	{"Sex|tio",  "Sex|ti¦on"},
-	{"Sju|tio",  "Sju|ti¦on"},
-	{"Åt|tio",   "Åt|ti¦on"},
-	{"Nit|tio",  "Nit|ti¦on"}
+	{"Tret¦tio", "Tret¦ti¦on"},
+	{"Fyr¦tio",  "Fyr¦ti¦on"},
+	{"Fem¦tio",  "Fem¦ti¦on"},
+	{"Sex¦tio",  "Sex¦ti¦on"},
+	{"Sjut¦tio", "Sjut¦ti¦on"},
+	{"Åt¦tio",   "Åt¦ti¦on"},
+	{"Nit¦tio",  "Nit¦ti¦on"}
 };
 
 static const char *wholes_and_halves[][5] = {
@@ -62,7 +62,7 @@ static const char *greats[][7] = {
 	{"||m",      "||un",        "",   "n",   "||de¦ci",           "nx*", "||cen¦ti"},
 	{"||b",      "||duo",       "",   "ms",  "||vi|gin¦ti",       "n",   "||du|cen¦ti"},
 	{"||tr",     "||tre",       "s*", "ns",  "||tri|gin¦ta",      "ns",  "||tre|cen¦ti"},
-	{"||kvad¦r", "||kvat¦tour", "",   "ns",  "||kvad¦ra|gin¦ta",  "ns",  "||kvad¦rin|gen¦ti"},
+	{"||kvad¦r", "||kvat¦tuor", "",   "ns",  "||kvad¦ra|gin¦ta",  "ns",  "||kvad¦rin|gen¦ti"},
 	{"||kvin¦t", "||kvin",      "",   "ns",  "||kvin¦kva|gin¦ta", "ns",  "||kvin|gen¦ti"},
 	{"||sex¦t",  "||se",        "sx", "n",   "||sex¦a|gin¦ta",    "n",   "||ses|cen¦ti"},
 	{"||sep¦t",  "||sep¦te",    "mn", "n",   "||sep¦tua|gin¦ta",  "n",   "||sep¦tin|gen¦ti"},
@@ -78,55 +78,61 @@ append(char outbuf[], size_t outbuf_size, size_t *lenp, const char *appendage, u
 	uint32_t hyphenation = flags & UINT32_C(0x00000C00);
 	int shift;
 
-	if (appendage[0] == '|' && appendage[1] == '|') {
-		if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_NO_HYPHENATION)
-			appendage = &appendage[2];
-		else
-			appendage = &appendage[1];
-	} else if (appendage[0] == '|') {
-		if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_NO_HYPHENATION ||
-		    hyphenation == LIBNUMTEXT_N2T_SWEDISH_COMPONENT_HYPHENATION) {
-			appendage = &appendage[1];
-		}
-	} else if (!strncmp(&appendage[appendage[0] == '<'], "¦", sizeof("¦") - 1)) {
-		shift = appendage[0] == '<';
-		appendage = &appendage[shift];
-		appendage = &appendage[sizeof("¦") - 1];
-		if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_SECONDARY_HYPHENATION)
-			p = stpcpy(hyphen, "¦");
-		else if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_SYLLABLE_HYPHENATION)
-			p = stpcpy(hyphen, "|");
-		else
-			*hyphen = 0;
-		if (*hyphen) {
-			if (shift && *lenp <= outbuf_size) {
-				*p++ = outbuf[--*lenp];
-				*p = '\0';
+	for (; *appendage; appendage++) {
+		if (appendage[0] == '|' && appendage[1] == '|') {
+			if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_NO_HYPHENATION)
+				appendage = &appendage[2];
+			else
+				appendage = &appendage[1];
+		} else if (appendage[0] == '|') {
+			if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_NO_HYPHENATION ||
+			    hyphenation == LIBNUMTEXT_N2T_SWEDISH_COMPONENT_HYPHENATION) {
+				appendage = &appendage[1];
 			}
-			for (p = hyphen; *p; p++) {
-				if (*lenp < outbuf_size)
-					outbuf[*lenp] = *p;
+		} else if (!strncmp(&appendage[appendage[0] == '<'], "¦", sizeof("¦") - 1)) {
+			shift = appendage[0] == '<';
+			appendage = &appendage[shift];
+			appendage = &appendage[sizeof("¦") - 1];
+			if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_SECONDARY_HYPHENATION)
+				p = stpcpy(hyphen, "¦");
+			else if (hyphenation == LIBNUMTEXT_N2T_SWEDISH_SYLLABLE_HYPHENATION)
+				p = stpcpy(hyphen, "|");
+			else
+				*hyphen = 0;
+			if (*hyphen) {
+				if (shift && *lenp <= outbuf_size) {
+					*p++ = outbuf[--*lenp];
+					*p = '\0';
+				}
+				for (p = hyphen; *p; p++) {
+					if (*lenp < outbuf_size)
+						outbuf[*lenp] = *p;
+					*lenp += 1;
+				}
+			}
+		}
+
+		if (*lenp >= 2 && outbuf[*lenp - 2] == outbuf[*lenp - 1] && outbuf[*lenp - 1] == appendage[appendage[0] == '|']) {
+			if (appendage[0] == '|' && (flags & UINT32_C(0x00003000)) != LIBNUMTEXT_N2T_SWEDISH_EXPLICIT_TRIPLETS)
+				appendage = &appendage[1];
+			if ((flags & UINT32_C(0x00003000)) == LIBNUMTEXT_N2T_SWEDISH_REDUCED_TRIPLETS)
+				*lenp -= 1;
+			else if ((flags & UINT32_C(0x00003000)) == LIBNUMTEXT_N2T_SWEDISH_LATEX_TRIPLETS)
+				outbuf[*lenp - 2] = '"';
+		}
+
+		if (*lenp && (flags & (LIBNUMTEXT_N2T_SWEDISH_HYPHENATED | hyphenation))) {
+			if (isupper(appendage[0]) || (appendage[0] == "Å"[0] && appendage[1] == "Å"[1])) {
+				if (*lenp < outbuf_size) {
+					if (flags & LIBNUMTEXT_N2T_SWEDISH_HYPHENATED)
+						outbuf[*lenp] = '-';
+					else
+						outbuf[*lenp] = '|';
+				}
 				*lenp += 1;
 			}
 		}
-	}
 
-	if (*lenp >= 2 && outbuf[*lenp - 2] == outbuf[*lenp - 1] && outbuf[*lenp - 1] == appendage[0]) {
-		if ((flags & UINT32_C(0x00002000)) == LIBNUMTEXT_N2T_SWEDISH_REDUCED_TRIPLETS)
-			*lenp -= 1;
-		else if ((flags & UINT32_C(0x00002000)) == LIBNUMTEXT_N2T_SWEDISH_LATEX_TRIPLETS)
-			outbuf[*lenp - 2] = '"';
-	}
-
-	if (*lenp && (flags & (LIBNUMTEXT_N2T_SWEDISH_HYPHENATED | hyphenation))) {
-		if (isupper(appendage[0]) || (appendage[0] == "Å"[0] && appendage[1] == "Å"[1])) {
-			if (*lenp < outbuf_size)
-				outbuf[*lenp] = '-';
-			*lenp += 1;
-		}
-	}
-
-	for (; *appendage; appendage++) {
 		if (*lenp < outbuf_size)
 			outbuf[*lenp] = *appendage;
 		*lenp += 1;
@@ -273,15 +279,15 @@ libnumtext_num2text_swedish__(char outbuf_[], size_t outbuf_size, const char *nu
 			num_len--;
 			if (thousands) {
 				if (first && thousands == 1 && (flags & LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE)) {
-					append(outbuf, outbuf_size, &len, "Tus¦en", flags);
+					append(outbuf, outbuf_size, &len, "Tu¦sen", flags);
 				} else {
 					append(outbuf, outbuf_size, &len, digits[thousands].cardinal_common, flags);
-					append(outbuf, outbuf_size, &len, "||tus¦en", flags);
+					append(outbuf, outbuf_size, &len, "||tu¦sen", flags);
 				}
 				append_for_ordinal = "¦de";
 				first = 0;
 			} else if (hundred_thousands || orig_thousands) {
-				append(outbuf, outbuf_size, &len, "||tus¦en", flags);
+				append(outbuf, outbuf_size, &len, "||tu¦sen", flags);
 				append_for_ordinal = "¦de";
 				first = 0;
 			}
@@ -293,7 +299,7 @@ libnumtext_num2text_swedish__(char outbuf_[], size_t outbuf_size, const char *nu
 			hundreds = *num++ - '0';
 			num_len--;
 			if (hundreds) {
-				if (first && hundred_thousands == 1 && (flags & LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE)) {
+				if (first && hundreds == 1 && (flags & LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE)) {
 					append(outbuf, outbuf_size, &len, "Hun¦dra", flags);
 				} else {
 					append(outbuf, outbuf_size, &len, digits[hundreds].cardinal_common, flags);
@@ -310,15 +316,15 @@ libnumtext_num2text_swedish__(char outbuf_[], size_t outbuf_size, const char *nu
 			ones = *num++ - '0';
 			num_len--;
 			if (tens[ones].cardinal) {
-				if (last && (flags & LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR) && *num == '0') {
+				if (!great_order && (flags & LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR) && *num == '0') {
 					append(outbuf, outbuf_size, &len, tens[ones].ordinal, flags);
-				} else if (last && !great_order && *num == '0') {
+				} else if (!great_order && (flags & LIBNUMTEXT_N2T_SWEDISH_ORDINAL) && *num == '0') {
 					append(outbuf, outbuf_size, &len, tens[ones].ordinal, flags);
-					append(outbuf, outbuf_size, &len, "¦de", flags);
+					append_for_ordinal = "¦de";
 				} else {
 					append(outbuf, outbuf_size, &len, tens[ones].cardinal, flags);
+					append_for_ordinal = NULL;
 				}
-				append_for_ordinal = NULL;
 				ones = 0;
 				first = 0;
 			} else {
@@ -332,14 +338,17 @@ libnumtext_num2text_swedish__(char outbuf_[], size_t outbuf_size, const char *nu
 			ones += *num++ - '0';
 			if (ones) {
 				append_for_ordinal = NULL;
-				if (last && (flags & LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR)) {
+				if (!great_order && (flags & LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR)) {
 					if ((flags & UINT32_C(0x00000030)) == LIBNUMTEXT_N2T_SWEDISH_MASCULINE_GENDER)
 						append(outbuf, outbuf_size, &len, digits[ones].ordinal_masculine, flags);
 					else
 						append(outbuf, outbuf_size, &len, digits[ones].ordinal_other, flags);
 					append_for_ordinal = digits[ones].ordinal_suffix;
-				} else if (!digits[ones].cardinal_other ||
-				           (last && (flags & UINT32_C(0x00000030)) == LIBNUMTEXT_N2T_SWEDISH_COMMON_GENDER)) {
+				} else if (!digits[ones].cardinal_other) {
+					append(outbuf, outbuf_size, &len, digits[ones].cardinal_common, flags);
+				} else if (great_order) {
+					append(outbuf, outbuf_size, &len, digits[ones].cardinal_other, flags);
+				} else if ((flags & UINT32_C(0x00000030)) == LIBNUMTEXT_N2T_SWEDISH_COMMON_GENDER) {
 					append(outbuf, outbuf_size, &len, digits[ones].cardinal_common, flags);
 				} else {
 					append(outbuf, outbuf_size, &len, digits[ones].cardinal_other, flags);
@@ -349,9 +358,9 @@ libnumtext_num2text_swedish__(char outbuf_[], size_t outbuf_size, const char *nu
 			break;
 		}
 
-		if (great_order) {
+		if (great_order && small_num) {
 			if (great_order < 10) {
-				append(outbuf, outbuf_size, &len, greats[great_order - 1][0], flags);
+				append(outbuf, outbuf_size, &len, greats[great_order][0], flags);
 			} else if (great_order > 999) {
 				errno = EDOM;
 				return -1;
@@ -430,9 +439,9 @@ out:
 	outbuf_size += offset;
 
 	if ((size_t)len < outbuf_size)
-		outbuf[len] = '0';
+		outbuf[len] = '\0';
 	else if (outbuf_size)
-		outbuf[outbuf_size - 1] = '0';
+		outbuf[outbuf_size - 1] = '\0';
 	len += 1;
 
 	if (!outbuf_size)
@@ -460,13 +469,13 @@ out:
 
 	} else if ((flags & UINT32_C(0x00000300)) == LIBNUMTEXT_N2T_SWEDISH_UPPER_CASE) {
 		for (; outbuf[i]; i++)
-			if (isupper(outbuf[i]) || outbuf[i] == '\xa5' || outbuf[i] == '\xa4' || outbuf[i] == '\xb6')
+			if (islower(outbuf[i]) || outbuf[i] == '\xa5' || outbuf[i] == '\xa4' || outbuf[i] == '\xb6')
 				outbuf[i] ^= 0x20;
 
 	} else if ((flags & UINT32_C(0x00000300)) == LIBNUMTEXT_N2T_SWEDISH_LOWER_CASE) {
 	lower_case:
 		for (; outbuf[i]; i++)
-			if (islower(outbuf[i]) || outbuf[i] == '\x85')
+			if (isupper(outbuf[i]) || outbuf[i] == '\x85')
 				outbuf[i] ^= 0x20;
 	}
 

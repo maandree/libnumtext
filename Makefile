@@ -3,18 +3,30 @@
 CONFIGFILE = config.mk
 include $(CONFIGFILE)
 
+LANG =\
+	swedish
+
 OBJ =\
 	libnumtext_num2text.o\
 	libnumtext_remove_separators.o\
-	swedish.o
+	$(LANG:=.o)
 
 HDR =\
 	libnumtext.h\
 	common.h
 
+TEST =\
+	$(LANG:=.test)
+
+TEST_OBJ =\
+	$(TEST:=.o)
+
+
 all: libnumtext.a
 $(OBJ): $(HDR)
 $(OBJ:.o=.lo): $(HDR)
+$(TEST_OBJ): libnumtext.h
+$(TEST): libnumtext.a
 
 .c.o:
 	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
@@ -22,9 +34,19 @@ $(OBJ:.o=.lo): $(HDR)
 .c.lo:
 	$(CC) -fPIC -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
 
+.test.o.test:
+	$(CC) -o $@ $< libnumtext.a $(LDFLAGS)
+
 libnumtext.a: $(OBJ)
 	@rm -f -- $@
 	$(AR) rc $@ $(OBJ)
+
+check: $(TEST)
+	@set -e &&\
+	for t in $(TEST); do\
+		printf './%s\n' "$$t";\
+		"./$$t" || exit 1;\
+	done
 
 install: libnumtext.a
 	mkdir -p -- "$(DESTDIR)$(PREFIX)/lib"
@@ -40,6 +62,6 @@ clean:
 	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda
 
 .SUFFIXES:
-.SUFFIXES: .lo .o .c
+.SUFFIXES: .lo .o .c .test .test.o
 
-.PHONY: all install uninstall clean
+.PHONY: all check install uninstall clean

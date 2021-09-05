@@ -10,3 +10,4 @@
 *.gcov
 *.gcno
 *.gcda
+*.test
