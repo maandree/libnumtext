@@ -238,7 +238,7 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 	if (INVALID_BITS(flags) || X_INVALID_TRIPLETS(flags))
 		goto einval;
 	if (PLURAL_FORM(flags) || DEFINITE_FORM(flags))
-		if (!ORDINAL(flags) || !DENOMINATOR(flags))
+		if (!ORDINAL(flags) && !DENOMINATOR(flags))
 			goto einval;
 
 	state.outbuf = outbuf;
