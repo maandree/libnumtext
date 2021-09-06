@@ -94,7 +94,7 @@ static struct ten {
 
 static const char *wholes_and_halves[][5] = {
 	{"Hel",  "He¦la",  "Hel¦an",  "Hel¦or¦na",  "Hel¦te"},
-	{"Halv", "Hal¦va", "Halv¦an", "Halv¦or¦na", "Half¦te"}
+	{"Halv", "Hal¦vor", "Halv¦an", "Halv¦or¦na", "Half¦te"}
 };
 
 static const char *great_suffixes[] = {
@@ -285,7 +285,7 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 				i = 4;
 			else
 				i = (size_t)((flags / LIBNUMTEXT_N2T_SWEDISH_PLURAL_FORM) & 3);
-			append(&state, wholes_and_halves[num[0] - 1][i]);
+			append(&state, wholes_and_halves[num[0] - '1'][i]);
 			goto out;
 		}
 	}

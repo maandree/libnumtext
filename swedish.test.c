@@ -3,6 +3,7 @@
 
 #define F(FLAG) LIBNUMTEXT_N2T_SWEDISH_##FLAG
 #define ORD F(ORDINAL)
+#define DENUM F(DENOMINATOR)
 
 
 #define ORDS(N, Z, E, FLAGS, ERR)\
@@ -10,6 +11,44 @@
 	{N, Z, E, (FLAGS) | ORD | F(PLURAL_FORM), ERR},\
 	{N, Z, E, (FLAGS) | ORD | F(DEFINITE_FORM), ERR},\
 	{N, Z, E, (FLAGS) | ORD | F(PLURAL_FORM) | F(DEFINITE_FORM), ERR}
+
+#define DENUMS_(N, Z, E, FLAGS, ERR)\
+	{N, Z, E"del", (FLAGS) | DENUM, ERR},\
+	{N, Z, E"delar", (FLAGS) | DENUM | F(PLURAL_FORM), ERR},\
+	{N, Z, E"delen", (FLAGS) | DENUM | F(DEFINITE_FORM), ERR},\
+	{N, Z, E"delarna", (FLAGS) | DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), ERR}
+
+#define DENUMS(N, Z, E, FLAGS, ERR)\
+	DENUMS_(N, Z, E, (FLAGS) | F(COMMON_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(NEUTER_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(MASCULINE_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(FEMININE_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(COMMON_GENDER) | F(IMPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(NEUTER_GENDER) | F(IMPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(MASCULINE_GENDER) | F(IMPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(FEMININE_GENDER) | F(IMPLICIT_ONE), ERR)
+
+#define DENUMS_AE(N, Z, E, FLAGS, ERR)\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(COMMON_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(NEUTER_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"e", (FLAGS) | F(MASCULINE_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(FEMININE_GENDER) | F(EXPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(COMMON_GENDER) | F(IMPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(NEUTER_GENDER) | F(IMPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"e", (FLAGS) | F(MASCULINE_GENDER) | F(IMPLICIT_ONE), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(FEMININE_GENDER) | F(IMPLICIT_ONE), ERR)
+
+#define ORDS_DENUMS(N, Z, E, FLAGS, ERR)\
+	ORDS(N, Z, E, FLAGS, ERR),\
+	DENUMS(N, Z, E, FLAGS, ERR)
+
+#define ORDS_DENUMS_AE(N, Z, E, FLAGS, ERR)\
+	ORDS(N, Z, E"a", FLAGS, ERR),\
+	DENUMS_AE(N, Z, E, FLAGS, ERR)
+
+#define CARD_DENUMS(N, Z, E, FLAGS, ERR)\
+	{N, Z, E, FLAGS, ERR},\
+	DENUMS(N, Z, E, FLAGS, ERR)
 
 static struct test {
 	const char *num;
@@ -28,6 +67,10 @@ static struct test {
 	ORDS("+0", 0, "plus-nollte", 0, 0),
 	ORDS("-0", 0, "minus-nollte", 0, 0),
 	ORDS(UNICODE_MINUS"0", 0, "minus-nollte", 0, 0),
+	DENUMS("0", 0, "nollte", 0, 0),
+	DENUMS("+0", 0, "plus-nollte", 0, 0),
+	DENUMS("-0", 0, "minus-nollte", 0, 0),
+	DENUMS(UNICODE_MINUS"0", 0, "minus-nollte", 0, 0),
 	{"1", 0, "ett", 0, 0},
 	{"+1", 0, "plus ett", 0, 0},
 	{"-1", 0, "minus ett", 0, 0},
@@ -36,6 +79,10 @@ static struct test {
 	ORDS("+1", 0, "plus-första", 0, 0),
 	ORDS("-1", 0, "minus-första", 0, 0),
 	ORDS(UNICODE_MINUS"1", 0, "minus-första", 0, 0),
+	{"1", 0, "hel", DENUM, 0}, /* TODO genders */
+	{"1", 0, "hela", DENUM | F(PLURAL_FORM), 0},
+	{"1", 0, "helan", DENUM | F(DEFINITE_FORM), 0},
+	{"1", 0, "helorna", DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0},
 	{"2", 0, "två", 0, 0},
 	{"+2", 0, "plus två", 0, 0},
 	{"-2", 0, "minus två", 0, 0},
@@ -44,92 +91,111 @@ static struct test {
 	ORDS("+2", 0, "plus-andra", 0, 0),
 	ORDS("-2", 0, "minus-andra", 0, 0),
 	ORDS(UNICODE_MINUS"2", 0, "minus-andra", 0, 0),
+	{"2", 0, "halv", DENUM, 0}, /* TODO genders */
+	{"2", 0, "halvor", DENUM | F(PLURAL_FORM), 0},
+	{"2", 0, "halvan", DENUM | F(DEFINITE_FORM), 0},
+	{"2", 0, "halvorna", DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0},
 	{"3", 0, "tre", 0, 0},
 	{"+3", 0, "plus tre", 0, 0},
 	{"-3", 0, "minus tre", 0, 0},
 	{UNICODE_MINUS"3", 0, "minus tre", 0, 0},
-	ORDS("3", 0, "tredje", 0, 0),
-	ORDS("+3", 0, "plus-tredje", 0, 0),
-	ORDS("-3", 0, "minus-tredje", 0, 0),
-	ORDS(UNICODE_MINUS"3", 0, "minus-tredje", 0, 0),
+	ORDS_DENUMS("3", 0, "tredje", 0, 0),
+	ORDS_DENUMS("+3", 0, "plus-tredje", 0, 0),
+	ORDS_DENUMS("-3", 0, "minus-tredje", 0, 0),
+	ORDS_DENUMS(UNICODE_MINUS"3", 0, "minus-tredje", 0, 0),
 	{"4", 0, "fyra", 0, 0},
-	ORDS("4", 0, "fjärde", 0, 0),
+	ORDS_DENUMS("4", 0, "fjärde", 0, 0),
 	{"5", 0, "fem", 0, 0},
-	ORDS("5", 0, "femte", 0, 0),
+	ORDS_DENUMS("5", 0, "femte", 0, 0),
 	{"6", 0, "sex", 0, 0},
-	ORDS("6", 0, "sjätte", 0, 0),
+	ORDS_DENUMS("6", 0, "sjätte", 0, 0),
 	{"7", 0, "sju", 0, 0},
-	ORDS("7", 0, "sjunde", 0, 0),
+	ORDS_DENUMS("7", 0, "sjunde", 0, 0),
 	{"8", 0, "åtta", 0, 0},
 	ORDS("8", 0, "åttonde", 0, 0),
+	DENUMS("8", 0, "åtton", 0, 0),
 	{"9", 0, "nio", 0, 0},
 	ORDS("9", 0, "nionde", 0, 0),
+	DENUMS("9", 0, "nion", 0, 0),
 	{"00009", 0, "nio", 0, 0},
 	{"10", 0, "tio", 0, 0},
 	ORDS("10", 0, "tionde", 0, 0),
+	DENUMS("10", 0, "tion", 0, 0),
 	{"11", 0, "elva", 0, 0},
-	ORDS("11", 0, "elfte", 0, 0),
+	ORDS_DENUMS("11", 0, "elfte", 0, 0),
 	{"12", 0, "tolv", 0, 0},
-	ORDS("12", 0, "tolfte", 0, 0),
-	{"13", 0, "tretton", 0, 0},
+	ORDS_DENUMS("12", 0, "tolfte", 0, 0),
+	CARD_DENUMS("13", 0, "tretton", 0, 0),
 	ORDS("13", 0, "trettonde", 0, 0),
-	{"14", 0, "fjorton", 0, 0},
+	CARD_DENUMS("14", 0, "fjorton", 0, 0),
 	ORDS("14", 0, "fjortonde", 0, 0),
-	{"15", 0, "femton", 0, 0},
+	CARD_DENUMS("15", 0, "femton", 0, 0),
 	ORDS("15", 0, "femtonde", 0, 0),
-	{"16", 0, "sexton", 0, 0},
+	CARD_DENUMS("16", 0, "sexton", 0, 0),
 	ORDS("16", 0, "sextonde", 0, 0),
-	{"17", 0, "sjutton", 0, 0},
+	CARD_DENUMS("17", 0, "sjutton", 0, 0),
 	ORDS("17", 0, "sjuttonde", 0, 0),
-	{"18", 0, "arton", 0, 0},
+	CARD_DENUMS("18", 0, "arton", 0, 0),
 	ORDS("18", 0, "artonde", 0, 0),
-	{"19", 0, "nitton", 0, 0},
+	CARD_DENUMS("19", 0, "nitton", 0, 0),
 	ORDS("19", 0, "nittonde", 0, 0),
 	{"20", 0, "tjugo", 0, 0},
 	ORDS("20", 0, "tjugonde", 0, 0),
+	DENUMS("20", 0, "tjugon", 0, 0),
 	{"21", 0, "tjugoett", 0, 0},
-	ORDS("21", 0, "tjugoförsta", 0, 0),
+	ORDS_DENUMS_AE("21", 0, "tjugoförst", 0, 0),
 	{"22", 0, "tjugotvå", 0, 0},
-	ORDS("22", 0, "tjugoandra", 0, 0),
+	ORDS_DENUMS_AE("22", 0, "tjugoandr", 0, 0),
 	{"23", 0, "tjugotre", 0, 0},
-	ORDS("23", 0, "tjugotredje", 0, 0),
+	ORDS_DENUMS("23", 0, "tjugotredje", 0, 0),
 	{"28", 0, "tjugoåtta", 0, 0},
 	ORDS("28", 0, "tjugoåttonde", 0, 0),
+	DENUMS("28", 0, "tjugoåtton", 0, 0),
 	{"29", 0, "tjugonio", 0, 0},
 	ORDS("29", 0, "tjugonionde", 0, 0),
+	DENUMS("29", 0, "tjugonion", 0, 0),
 	{"30", 0, "trettio", 0, 0},
 	ORDS("30", 0, "trettionde", 0, 0),
+	DENUMS("30", 0, "trettion", 0, 0),
 	{"31", 0, "trettioett", 0, 0},
-	ORDS("31", 0, "trettioförsta", 0, 0),
+	ORDS_DENUMS_AE("31", 0, "trettioförst", 0, 0),
 	{"32", 0, "trettiotvå", 0, 0},
-	ORDS("32", 0, "trettioandra", 0, 0),
+	ORDS_DENUMS_AE("32", 0, "trettioandr", 0, 0),
 	{"40", 0, "fyrtio", 0, 0},
 	ORDS("40", 0, "fyrtionde", 0, 0),
+	DENUMS("40", 0, "fyrtion", 0, 0),
 	{"43", 0, "fyrtiotre", 0, 0},
-	ORDS("43", 0, "fyrtiotredje", 0, 0),
+	ORDS_DENUMS("43", 0, "fyrtiotredje", 0, 0),
 	{"50", 0, "femtio", 0, 0},
 	ORDS("50", 0, "femtionde", 0, 0),
+	DENUMS("50", 0, "femtion", 0, 0),
 	{"54", 0, "femtiofyra", 0, 0},
-	ORDS("54", 0, "femtiofjärde", 0, 0),
+	ORDS_DENUMS("54", 0, "femtiofjärde", 0, 0),
 	{"60", 0, "sextio", 0, 0},
 	ORDS("60", 0, "sextionde", 0, 0),
+	DENUMS("60", 0, "sextion", 0, 0),
 	{"65", 0, "sextiofem", 0, 0},
-	ORDS("65", 0, "sextiofemte", 0, 0),
+	ORDS_DENUMS("65", 0, "sextiofemte", 0, 0),
 	{"70", 0, "sjuttio", 0, 0},
 	ORDS("70", 0, "sjuttionde", 0, 0),
+	DENUMS("70", 0, "sjuttion", 0, 0),
 	{"76", 0, "sjuttiosex", 0, 0},
-	ORDS("76", 0, "sjuttiosjätte", 0, 0),
+	ORDS_DENUMS("76", 0, "sjuttiosjätte", 0, 0),
 	{"80", 0, "åttio", 0, 0},
 	ORDS("80", 0, "åttionde", 0, 0),
+	DENUMS("80", 0, "åttion", 0, 0),
 	{"87", 0, "åttiosju", 0, 0},
-	ORDS("87", 0, "åttiosjunde", 0, 0),
+	ORDS_DENUMS("87", 0, "åttiosjunde", 0, 0),
 	{"90", 0, "nittio", 0, 0},
 	ORDS("90", 0, "nittionde", 0, 0),
+	DENUMS("90", 0, "nittion", 0, 0),
 	{"98", 0, "nittioåtta", 0, 0},
 	ORDS("98", 0, "nittioåttonde", 0, 0),
+	DENUMS("98", 0, "nittioåtton", 0, 0),
 	{"99", 0, "nittionio", 0, 0},
 	ORDS("99", 0, "nittionionde", 0, 0),
-	{"100", 0, "etthundra", 0, 0},
+	DENUMS("99", 0, "nittionion", 0, 0),
+	{"100", 0, "etthundra", 0, 0}, /* TODO DENUMS ← ↓ */
 	ORDS("100", 0, "etthundrade", 0, 0),
 	{"101", 0, "etthundraett", 0, 0},
 	ORDS("101", 0, "etthundraförsta", 0, 0),
@@ -750,9 +816,7 @@ main(void)
 	}
 
 	/* TODO test for separator removal */
-	/* TODO test LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR */
-	/* TODO test …DENOMINATOR with LIBNUMTEXT_N2T_SWEDISH_PLURAL_FORM */
-	/* TODO test …DENOMINATOR with LIBNUMTEXT_N2T_SWEDISH_DEFINITE_FORM */
+	/* TODO test …DENOMINATOR | …ORDINAL */
 
 	if (failures > 0) {
 		fprintf(stderr, "Failure count: %zu\n", failures);
