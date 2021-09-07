@@ -229,8 +229,7 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 	const char *great_10, *great_10_prefix, *gsuffix;
 	const char *great_100, *great_100_prefix, *gprefix;
 	char affix[2] = {[1] = 0};
-	size_t great_order, small_order, great_order_suffix;
-	size_t i, offset;
+	size_t great_order, small_order, great_order_suffix, i;
 	const char *append_for_ordinal = NULL;
 	size_t trailing_zeroes;
 	struct state state;
@@ -252,19 +251,10 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 			append(&state, num[0] == '+' ? "Plus-" : "Min¦us-");
 		else
 			append(&state, num[0] == '+' ? "Plus " : "Min¦us ");
-		offset = state.len;
-		if (offset > state.outbuf_size)
-			offset = state.outbuf_size;
-		state.outbuf += offset;
-		state.outbuf_size -= offset;
-		offset = state.len;
-		state.len = 0;
 		do {
 			num++;
 			num_len--;
 		} while ((*num & 0xC0) == 0x80);
-	} else {
-		offset = 0;
 	}
 
 	while (num_len > 1 && num[0] == '0') {
@@ -509,8 +499,6 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 	suffix(&state);
 
 out:
-	state.len += offset;
-
 	if (state.len < outbuf_size)
 		outbuf[state.len] = '\0';
 	else if (outbuf_size)
