@@ -59,7 +59,7 @@ uninstall:
 	-rm -f -- "$(DESTDIR)$(PREFIX)/include/libnumtext.h"
 
 clean:
-	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda
+	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda *.test
 
 .SUFFIXES:
 .SUFFIXES: .lo .o .c .test .test.o
