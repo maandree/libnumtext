@@ -396,13 +396,12 @@ adjust_case(struct state *state)
 
 
 ssize_t
-libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags)
+libnumtext_num2text_swedish__(struct common_num2text_params *params, const char *num, size_t num_len, uint32_t flags)
 {
 	int hundred_thousands, ten_thousands, one_thousands, hundreds, ones;
 	int great_plurality;
+	size_t great_order, great_order_suffix, small_order;
 	int32_t small_num;
-	size_t great_order, great_order_suffix;
-	size_t i, small_order, trailing_zeroes;
 	struct state state;
 
 	if (INVALID_BITS(flags) || X_INVALID_TRIPLETS(flags))
@@ -411,46 +410,26 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 		if (!ORDINAL(flags) && !DENOMINATOR(flags))
 			goto einval;
 
-	state.outbuf = outbuf;
-	state.outbuf_size = outbuf_size;
+	state.outbuf = params->outbuf;
+	state.outbuf_size = params->outbuf_size;
 	state.len = 0;
 	state.flags = flags;
 	state.double_char = 0;
 	state.first = 1;
 	state.append_for_ordinal = NULL;
 
-	if (!isdigit(num[0])) {
+	if (params->sign_length)
 		append(&state, signs[num[0] == '+'][TYPE_INDEX(flags)]);
-		do {
-			num++;
-			num_len--;
-		} while (IS_UTF8_CHAR_CONTINUATION(*num));
-	}
 
-	while (num_len > 1 && num[0] == '0') {
-		num++;
-		num_len--;
-	}
+	num += params->number_offset;
+	num_len -= params->number_offset;
 
-	if (num_len == 1) {
-		if (num[0] == '0') {
-			append_final_digit(&state, 0);
-			goto out_and_suffix;
-		} else if (num[0] <= '2' && DENOMINATOR(flags)) {
-			if (ORDINAL(flags))
-				append(&state, wholes_and_halves[num[0] - '1'].ordinal);
-			else
-				append(&state, wholes_and_halves[num[0] - '1'].cardinal[FORM_INDEX(flags)]);
-			goto out;
-		}
-	}
-
-	trailing_zeroes = 0;
-	for (i = 0; i < num_len; i += 1) {
-		if (num[i] == '0')
-			trailing_zeroes += 1;
+	if (num_len == 1 && '1' <= num[0] && num[0] <= '2' && DENOMINATOR(flags)) {
+		if (ORDINAL(flags))
+			append(&state, wholes_and_halves[num[0] - '1'].ordinal);
 		else
-			trailing_zeroes = 0;
+			append(&state, wholes_and_halves[num[0] - '1'].cardinal[FORM_INDEX(flags)]);
+		goto out;
 	}
 
 	while (num_len) {
@@ -528,7 +507,7 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 			small_num *= 10;
 			small_num += (int32_t)(*num - '0');
 			ones += *num++ - '0';
-			if (ones) {
+			if (ones || (state.first && !great_order)) {
 				state.append_for_ordinal = NULL;
 				if (!great_order)
 					append_final_digit(&state, ones);
@@ -542,14 +521,13 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 		}
 
 		if (great_order && small_num) {
-			great_plurality = (num_len > trailing_zeroes || (CARDINAL(flags) && NUMERATOR(flags)));
-			great_plurality = great_plurality && (small_num != 1);
+			great_plurality = (num_len > params->trailing_zeroes || (CARDINAL(flags) && NUMERATOR(flags)));
+			great_plurality = (great_plurality && small_num != 1);
 			if (append_great(&state, great_order, great_order_suffix, great_plurality))
 				return -1;
 		}
 	}
 
-out_and_suffix:
 	if (DENOMINATOR(flags))
 		append(&state, ORDINAL(flags) ? denominator_suffixes.ordinal : denominator_suffixes.cardinal[FORM_INDEX(flags)]);
 	else if (ORDINAL(flags) && state.append_for_ordinal)

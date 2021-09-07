@@ -6,25 +6,43 @@ ssize_t
 libnumtext_num2text(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                     enum libnumtext_language lang, uint32_t flags, ...)
 {
+	struct common_num2text_params params;
 	size_t i;
+
+	params.outbuf = outbuf;
+	params.outbuf_size = outbuf_size;
+	params.trailing_zeroes = 0;
 
 	i = 0;
 	if (i < num_len) {
-		if (num[i] == '+' || num[i] == '-')
+		if (num[i] == '+' || num[i] == '-') {
 			i += 1;
-		else if (!strncmp(&num[0], UNICODE_MINUS, sizeof(UNICODE_MINUS) - 1))
-			i += sizeof(UNICODE_MINUS) - 1;
+		} else if (num_len >= sizeof(UNICODE_MINUS)) {
+			if (!strncmp(&num[0], UNICODE_MINUS, sizeof(UNICODE_MINUS) - 1))
+				i += sizeof(UNICODE_MINUS) - 1;
+		}
 	}
+	params.sign_length = i;
 	if (i == num_len)
 		goto einval;
-	for (; i < num_len; i++)
+
+	while (i + 1 < num_len && num[i] == '0')
+		i += 1;
+	params.number_offset = i;
+
+	for (; i < num_len; i++) {
 		if (!isdigit(num[i]))
 			goto einval;
+		else if (num[i] == '0')
+			params.trailing_zeroes += 1;
+		else
+			params.trailing_zeroes = 0;
+	}
 
 	switch (lang) {
 
 	case LIBNUMTEXT_SWEDISH:
-		return libnumtext_num2text_swedish__(outbuf, outbuf_size, num, num_len, flags);
+		return libnumtext_num2text_swedish__(&params, num, num_len, flags);
 
 	default:
 	einval:
