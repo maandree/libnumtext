@@ -24,5 +24,7 @@
 
 #define UNICODE_MINUS "−"
 
+#define IS_UTF8_CHAR_CONTINUATION(B) (((B) & 0xC0) == 0x80)
+
 
 ssize_t libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags);
