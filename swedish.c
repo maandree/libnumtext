@@ -113,9 +113,12 @@ static const char *signs[2 /* whether + */][4 /* type */] = {
 	{"Plus ",   "Plus-",   "Plus-",   "Plus-"}
 };
 
-static const char *great_suffixes[2] = {
-	"il¦jon",
-	"il¦jard"
+static struct great_suffix {
+	const char *suffix[2 /* plural? */];
+	const char *ordinal_suffix;
+} great_suffixes[2 /* times 1000? */] = {
+	{{"il¦jon",  "il¦jon¦er"},  "¦te"},
+	{{"il¦jard", "il¦jard¦er"}, "<¦e"},
 };
 
 static struct great {
@@ -289,17 +292,117 @@ get_common_affix(const char *suffixes, const char *prefixes)
 }
 
 
-ssize_t
-libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags)
+static int
+append_great(struct state *state, size_t great_order, size_t great_order_suffix, int plurality)
 {
-	int hundred_thousands, ten_thousands, one_thousands, hundreds, ones;
-	int32_t small_num;
 	const char *great_1, *great_1_suffixes, *great_last;
 	const char *great_10, *great_10_prefixes;
 	const char *great_100, *great_100_prefixes;
 	char affix[2] = {[1] = 0};
-	size_t great_order, small_order, great_order_suffix, i;
-	size_t trailing_zeroes;
+
+	if (great_order < 10) {
+		append(state, greats[great_order].single_digit);
+	} else if (great_order > 999) {
+		errno = EDOM;
+		return -1;
+	} else {
+		great_1            = greats[(great_order /   1) % 10].ones;
+		great_1_suffixes   = greats[(great_order /   1) % 10].ones_suffixes;
+		great_10_prefixes  = greats[(great_order /  10) % 10].tens_prefixes;
+		great_10           = greats[(great_order /  10) % 10].tens;
+		great_100_prefixes = greats[(great_order / 100) % 10].hundreds_prefixes;
+		great_100          = greats[(great_order / 100) % 10].hundreds;
+		great_last = NULL;
+		if (great_1) {
+			append(state, great_1);
+			great_last = great_1;
+		}
+		if (great_10) {
+			if ((affix[0] = get_common_affix(great_1_suffixes, great_10_prefixes)))
+				append(state, affix);
+			append(state, great_10);
+			great_last = great_10;
+			great_1_suffixes = NULL;
+		}
+		if (great_100) {
+			if ((affix[0] = get_common_affix(great_1_suffixes, great_100_prefixes)))
+				append(state, affix);
+			append(state, great_100);
+			great_last = great_100;
+		}
+		while (great_last[1])
+			great_last = &great_last[1];
+		if (*great_last == 'a' || *great_last == 'e' || *great_last == 'i' || *great_last == 'o')
+			state->len -= 1;
+	}
+
+	append(state, great_suffixes[great_order_suffix].suffix[plurality]);
+	state->append_for_ordinal = great_suffixes[great_order_suffix].ordinal_suffix;
+
+	return 0;
+}
+
+
+static void
+nul_terminate(struct state *state)
+{
+	if (state->len < state->outbuf_size)
+		state->outbuf[state->len] = '\0';
+	else if (state->outbuf_size)
+		state->outbuf[state->outbuf_size - 1] = '\0';
+	state->len += 1;
+}
+
+
+static void
+adjust_case(struct state *state)
+{
+	char *p = state->outbuf;
+
+	if (!state->outbuf_size)
+		return;
+
+	/*
+	 * Å   = \xc3\x85
+	 * å   = \xc3\xa5
+	 * Ä   = \xc3\x84
+	 * ä   = \xc3\xa4
+	 * Ö   = \xc3\x96
+	 * ö   = \xc3\xb6
+	 * A-Z = 0x41 - 0x5a
+	 * a-z = 0x61 - 0x7a
+	 * |   = 0x7c
+	 * ¦   = \xc2\xa6
+	 * -   = 0x2d
+	 */
+	if (SENTENCE_CASE(state->flags)) {
+		p++;
+		while (IS_UTF8_CHAR_CONTINUATION(*p))
+			p++;
+		goto lower_case;
+
+	} else if (UPPER_CASE(state->flags)) {
+		for (; *p; p++)
+			if (islower(*p) || *p == '\xa5' || *p == '\xa4' || *p == '\xb6')
+				*p ^= 0x20;
+
+	} else if (LOWER_CASE(state->flags)) {
+	lower_case:
+		for (; *p; p++)
+			if (isupper(*p) || *p == '\x85')
+				*p ^= 0x20;
+	}
+}
+
+
+ssize_t
+libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags)
+{
+	int hundred_thousands, ten_thousands, one_thousands, hundreds, ones;
+	int great_plurality;
+	int32_t small_num;
+	size_t great_order, great_order_suffix;
+	size_t i, small_order, trailing_zeroes;
 	struct state state;
 
 	if (INVALID_BITS(flags) || X_INVALID_TRIPLETS(flags))
@@ -356,14 +459,14 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 		small_order = num_len % 6;
 
 		great_order_suffix = 0;
-		hundred_thousands = ten_thousands = one_thousands = hundreds = ones = 0;
-
 		if (great_order && small_order >= 3) {
 			small_order -= 3;
 			great_order_suffix = 1;
 		}
 
 		small_num = 0;
+		hundred_thousands = ten_thousands = one_thousands = hundreds = ones = 0;
+
 		switch (small_order) {
 		case 5:
 			hundred_thousands = *num++ - '0';
@@ -439,100 +542,22 @@ libnumtext_num2text_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 		}
 
 		if (great_order && small_num) {
-			if (great_order < 10) {
-				append(&state, greats[great_order].single_digit);
-			} else if (great_order > 999) {
-				errno = EDOM;
+			great_plurality = (num_len > trailing_zeroes || (CARDINAL(flags) && NUMERATOR(flags)));
+			great_plurality = great_plurality && (small_num != 1);
+			if (append_great(&state, great_order, great_order_suffix, great_plurality))
 				return -1;
-			} else {
-				great_1            = greats[(great_order /   1) % 10].ones;
-				great_1_suffixes   = greats[(great_order /   1) % 10].ones_suffixes;
-				great_10_prefixes  = greats[(great_order /  10) % 10].tens_prefixes;
-				great_10           = greats[(great_order /  10) % 10].tens;
-				great_100_prefixes = greats[(great_order / 100) % 10].hundreds_prefixes;
-				great_100          = greats[(great_order / 100) % 10].hundreds;
-				great_last = NULL;
-				if (great_1) {
-					append(&state, great_1);
-					great_last = great_1;
-				}
-				if (great_10) {
-					if ((affix[0] = get_common_affix(great_1_suffixes, great_10_prefixes)))
-						append(&state, affix);
-					append(&state, great_10);
-					great_last = great_10;
-					great_1_suffixes = NULL;
-				}
-				if (great_100) {
-					if ((affix[0] = get_common_affix(great_1_suffixes, great_100_prefixes)))
-						append(&state, affix);
-					append(&state, great_100);
-					great_last = great_100;
-				}
-				while (great_last[1])
-					great_last = &great_last[1];
-				if (*great_last == 'a' || *great_last == 'e' || *great_last == 'i' || *great_last == 'o')
-					state.len -= 1;
-			}
-			append(&state, great_suffixes[great_order_suffix]);
-			state.append_for_ordinal = great_order_suffix == 0 ? "¦te" : "<¦e";
-			if (small_num != 1)
-				if (num_len > trailing_zeroes || !(ORDINAL(flags) || DENOMINATOR(flags)))
-					append(&state, "¦er");
 		}
 	}
 
-	if (ORDINAL(flags) && !DENOMINATOR(flags) && state.append_for_ordinal)
+out_and_suffix:
+	if (DENOMINATOR(flags))
+		append(&state, ORDINAL(flags) ? denominator_suffixes.ordinal : denominator_suffixes.cardinal[FORM_INDEX(flags)]);
+	else if (ORDINAL(flags) && state.append_for_ordinal)
 		append(&state, state.append_for_ordinal);
 
-out_and_suffix:
-	if (DENOMINATOR(state.flags)) {
-		append(&state, ORDINAL(state.flags) ? denominator_suffixes.ordinal
-		                                    : denominator_suffixes.cardinal[FORM_INDEX(state.flags)]);
-	}
-
 out:
-	if (state.len < outbuf_size)
-		outbuf[state.len] = '\0';
-	else if (outbuf_size)
-		outbuf[outbuf_size - 1] = '\0';
-	state.len += 1;
-
-	if (!outbuf_size)
-		return (ssize_t)state.len;
-
-	/*
-	 * Å   = \xc3\x85
-	 * å   = \xc3\xa5
-	 * Ä   = \xc3\x84
-	 * ä   = \xc3\xa4
-	 * Ö   = \xc3\x96
-	 * ö   = \xc3\xb6
-	 * A-Z = 0x41 - 0x5a
-	 * a-z = 0x61 - 0x7a
-	 * |   = 0x7c
-	 * ¦   = \xc2\xa6
-	 * -   = 0x2d
-	 */
-	i = 0;
-	if (SENTENCE_CASE(flags)) {
-		i = 1;
-		while (IS_UTF8_CHAR_CONTINUATION(outbuf[i]))
-			i += 1;
-		goto lower_case;
-
-	} else if (UPPER_CASE(flags)) {
-		for (; outbuf[i]; i++)
-			if (islower(outbuf[i]) || outbuf[i] == '\xa5' || outbuf[i] == '\xa4' || outbuf[i] == '\xb6')
-				outbuf[i] ^= 0x20;
-
-	} else if (LOWER_CASE(flags)) {
-	lower_case:
-		for (; outbuf[i]; i++)
-			if (isupper(outbuf[i]) || outbuf[i] == '\x85')
-				outbuf[i] ^= 0x20;
-	}
-
+	nul_terminate(&state);
+	adjust_case(&state);
 	return (ssize_t)state.len;
 
 einval:
