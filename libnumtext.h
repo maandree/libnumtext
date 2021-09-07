@@ -17,13 +17,13 @@ enum libnumtext_language {
 #define LIBNUMTEXT_N2T_SWEDISH_ORDINAL               UINT32_C(0x00000001) /* första/-e, andra/-e, tredje, … */
 
 #define LIBNUMTEXT_N2T_SWEDISH_NUMERATOR             UINT32_C(0)
-#define LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR           UINT32_C(0x00000002) /* hel, halv, tredjedel, … */
+#define LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR           UINT32_C(0x00000002) /* hel, halv, tredjedel, … [1] */
 
 #define LIBNUMTEXT_N2T_SWEDISH_SINGULAR_FORM         UINT32_C(0)
-#define LIBNUMTEXT_N2T_SWEDISH_PLURAL_FORM           UINT32_C(0x00000004) /* hela, halvor, tredjedelar, … [1] */
+#define LIBNUMTEXT_N2T_SWEDISH_PLURAL_FORM           UINT32_C(0x00000004) /* hela, halvor, tredjedelar, … [2] */
 
 #define LIBNUMTEXT_N2T_SWEDISH_INDEFINITE_FORM       UINT32_C(0)
-#define LIBNUMTEXT_N2T_SWEDISH_DEFINITE_FORM         UINT32_C(0x00000008) /* halan, halvan, tredjelen, … [1] */
+#define LIBNUMTEXT_N2T_SWEDISH_DEFINITE_FORM         UINT32_C(0x00000008) /* halan, halvan, tredjelen, … [2] */
 
 #define LIBNUMTEXT_N2T_SWEDISH_COMMON_GENDER         UINT32_C(0x00000000) /* ett/första, två/andra, … */
 #define LIBNUMTEXT_N2T_SWEDISH_NEUTER_GENDER         UINT32_C(0x00000010) /* en/första, två/andra, … */
@@ -50,7 +50,8 @@ enum libnumtext_language {
 #define LIBNUMTEXT_N2T_SWEDISH_EXPLICIT_TRIPLETS     UINT32_C(0x00001000) /* …, etttusen, … (not acceptable Swedish) */
 #define LIBNUMTEXT_N2T_SWEDISH_LATEX_TRIPLETS        UINT32_C(0x00002000) /* …, e"ttusen, … (for use in LaTeX) */
 
-/* [1] Requires LIBNUMTEXT_N2T_SWEDISH_ORDINAL (no effect) or LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR  */
+/* [1] If used, also use LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE, otherwise the Swedish becomes odd, and arguably incorrect */
+/* [2] Requires LIBNUMTEXT_N2T_SWEDISH_ORDINAL (no effect) or LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR  */
 
 
 /* input to libnumtext_num2str may not contain separators */

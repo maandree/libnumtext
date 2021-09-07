@@ -19,24 +19,16 @@
 	{N, Z, E"delarna", (FLAGS) | DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), ERR}
 
 #define DENUMS(N, Z, E, FLAGS, ERR)\
-	DENUMS_(N, Z, E, (FLAGS) | F(COMMON_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(NEUTER_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(MASCULINE_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(FEMININE_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(COMMON_GENDER) | F(IMPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(NEUTER_GENDER) | F(IMPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(MASCULINE_GENDER) | F(IMPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E, (FLAGS) | F(FEMININE_GENDER) | F(IMPLICIT_ONE), ERR)
+	DENUMS_(N, Z, E, (FLAGS) | F(COMMON_GENDER), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(NEUTER_GENDER), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(MASCULINE_GENDER), ERR),\
+	DENUMS_(N, Z, E, (FLAGS) | F(FEMININE_GENDER), ERR)
 
 #define DENUMS_AE(N, Z, E, FLAGS, ERR)\
-	DENUMS_(N, Z, E"a", (FLAGS) | F(COMMON_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"a", (FLAGS) | F(NEUTER_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"e", (FLAGS) | F(MASCULINE_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"a", (FLAGS) | F(FEMININE_GENDER) | F(EXPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"a", (FLAGS) | F(COMMON_GENDER) | F(IMPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"a", (FLAGS) | F(NEUTER_GENDER) | F(IMPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"e", (FLAGS) | F(MASCULINE_GENDER) | F(IMPLICIT_ONE), ERR),\
-	DENUMS_(N, Z, E"a", (FLAGS) | F(FEMININE_GENDER) | F(IMPLICIT_ONE), ERR)
+	DENUMS_(N, Z, E"a", (FLAGS) | F(COMMON_GENDER), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(NEUTER_GENDER), ERR),\
+	DENUMS_(N, Z, E"e", (FLAGS) | F(MASCULINE_GENDER), ERR),\
+	DENUMS_(N, Z, E"a", (FLAGS) | F(FEMININE_GENDER), ERR)
 
 #define ORDS_DENUMS(N, Z, E, FLAGS, ERR)\
 	ORDS(N, Z, E, FLAGS, ERR),\
@@ -49,6 +41,12 @@
 #define CARD_DENUMS(N, Z, E, FLAGS, ERR)\
 	{N, Z, E, FLAGS, ERR},\
 	DENUMS(N, Z, E, FLAGS, ERR)
+
+#define ANY_GENDER(N, Z, E, FLAGS, ERR)\
+	{N, Z, E, (FLAGS) | F(COMMON_GENDER), ERR},\
+	{N, Z, E, (FLAGS) | F(NEUTER_GENDER), ERR},\
+	{N, Z, E, (FLAGS) | F(MASCULINE_GENDER), ERR},\
+	{N, Z, E, (FLAGS) | F(FEMININE_GENDER), ERR}
 
 static struct test {
 	const char *num;
@@ -79,10 +77,10 @@ static struct test {
 	ORDS("+1", 0, "plus-första", 0, 0),
 	ORDS("-1", 0, "minus-första", 0, 0),
 	ORDS(UNICODE_MINUS"1", 0, "minus-första", 0, 0),
-	{"1", 0, "hel", DENUM, 0}, /* TODO genders */
-	{"1", 0, "hela", DENUM | F(PLURAL_FORM), 0},
-	{"1", 0, "helan", DENUM | F(DEFINITE_FORM), 0},
-	{"1", 0, "helorna", DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0},
+	ANY_GENDER("1", 0, "hel", DENUM, 0),
+	ANY_GENDER("1", 0, "hela", DENUM | F(PLURAL_FORM), 0),
+	ANY_GENDER("1", 0, "helan", DENUM | F(DEFINITE_FORM), 0),
+	ANY_GENDER("1", 0, "helorna", DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0),
 	{"2", 0, "två", 0, 0},
 	{"+2", 0, "plus två", 0, 0},
 	{"-2", 0, "minus två", 0, 0},
@@ -91,10 +89,10 @@ static struct test {
 	ORDS("+2", 0, "plus-andra", 0, 0),
 	ORDS("-2", 0, "minus-andra", 0, 0),
 	ORDS(UNICODE_MINUS"2", 0, "minus-andra", 0, 0),
-	{"2", 0, "halv", DENUM, 0}, /* TODO genders */
-	{"2", 0, "halvor", DENUM | F(PLURAL_FORM), 0},
-	{"2", 0, "halvan", DENUM | F(DEFINITE_FORM), 0},
-	{"2", 0, "halvorna", DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0},
+	ANY_GENDER("2", 0, "halv", DENUM, 0),
+	ANY_GENDER("2", 0, "halvor", DENUM | F(PLURAL_FORM), 0),
+	ANY_GENDER("2", 0, "halvan", DENUM | F(DEFINITE_FORM), 0),
+	ANY_GENDER("2", 0, "halvorna", DENUM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0),
 	{"3", 0, "tre", 0, 0},
 	{"+3", 0, "plus tre", 0, 0},
 	{"-3", 0, "minus tre", 0, 0},
@@ -195,33 +193,35 @@ static struct test {
 	{"99", 0, "nittionio", 0, 0},
 	ORDS("99", 0, "nittionionde", 0, 0),
 	DENUMS("99", 0, "nittionion", 0, 0),
-	{"100", 0, "etthundra", 0, 0}, /* TODO DENUMS ← ↓ */
+	CARD_DENUMS("100", 0, "etthundra", 0, 0), /* Note: IMPLICIT_ONES is not set so DENUM will be "etthundradel" */
 	ORDS("100", 0, "etthundrade", 0, 0),
 	{"101", 0, "etthundraett", 0, 0},
-	ORDS("101", 0, "etthundraförsta", 0, 0),
+	ORDS_DENUMS_AE("101", 0, "etthundraförst", 0, 0),
 	{"110", 0, "etthundratio", 0, 0},
 	ORDS("110", 0, "etthundrationde", 0, 0),
+	DENUMS("110", 0, "etthundration", 0, 0),
 	{"111", 0, "etthundraelva", 0, 0},
 	ORDS("111", 0, "etthundraelfte", 0, 0),
 	{"120", 0, "etthundratjugo", 0, 0},
 	ORDS("120", 0, "etthundratjugonde", 0, 0),
+	DENUMS("120", 0, "etthundratjugon", 0, 0),
 	{"121", 0, "etthundratjugoett", 0, 0},
-	ORDS("121", 0, "etthundratjugoförsta", 0, 0),
+	ORDS_DENUMS_AE("121", 0, "etthundratjugoförst", 0, 0),
 	{"999", 0, "niohundranittionio", 0, 0},
 	ORDS("999", 0, "niohundranittionionde", 0, 0),
-	{"1000", 0, "ettusen", 0, 0},
+	CARD_DENUMS("1000", 0, "ettusen", 0, 0),
 	ORDS("1000", 0, "ettusende", 0, 0),
 	{"1001", 0, "ettusenett", 0, 0},
-	ORDS("1001", 0, "ettusenförsta", 0, 0),
+	ORDS_DENUMS_AE("1001", 0, "ettusenförst", 0, 0),
 	{"1002", 0, "ettusentvå", 0, 0},
-	ORDS("1002", 0, "ettusenandra", 0, 0),
+	ORDS_DENUMS_AE("1002", 0, "ettusenandr", 0, 0),
 	{"1100", 0, "ettusenetthundra", 0, 0},
 	ORDS("1100", 0, "ettusenetthundrade", 0, 0),
 	{"1101", 0, "ettusenetthundraett", 0, 0},
 	ORDS("1101", 0, "ettusenetthundraförsta", 0, 0),
 	{"1123", 0, "ettusenetthundratjugotre", 0, 0},
 	ORDS("1123", 0, "ettusenetthundratjugotredje", 0, 0),
-	{"2000", 0, "tvåtusen", 0, 0},
+	CARD_DENUMS("2000", 0, "tvåtusen", 0, 0),
 	ORDS("2000", 0, "tvåtusende", 0, 0),
 	{"3000", 0, "tretusen", 0, 0},
 	ORDS("3000", 0, "tretusende", 0, 0),
@@ -284,7 +284,7 @@ static struct test {
 	{"182000", 0, "etthundraåttiotvåtusende", ORD, 0},
 	{"300000", 0, "trehundratusen", 0, 0},
 	{"300000", 0, "trehundratusende", ORD, 0},
-	{"1""000000", 0, "enmiljon", 0, 0},
+	CARD_DENUMS("1""000000", 0, "enmiljon", 0, 0),
 	ORDS("1""000000", 0, "enmiljonte", 0, 0),
 	{"1""200000", 0, "enmiljontvåhundratusen", 0, 0},
 	ORDS("1""200000", 0, "enmiljontvåhundratusende", 0, 0),
@@ -302,6 +302,7 @@ static struct test {
 	{"9""999999", 0, "niomiljonerniohundranittioniotusenniohundranittionio", 0, 0},
 	ORDS("9""999999", 0, "niomiljonerniohundranittioniotusenniohundranittionionde", 0, 0),
 	{"10""000000", 0, "tiomiljoner", 0, 0},
+	DENUMS("10""000000", 0, "tiomiljon", 0, 0),
 	ORDS("10""000000", 0, "tiomiljonte", 0, 0),
 	{"11""000000", 0, "elvamiljoner", 0, 0},
 	ORDS("11""000000", 0, "elvamiljonte", 0, 0),
@@ -317,9 +318,10 @@ static struct test {
 	ORDS("169""000000", 0, "etthundrasextioniomiljonte", 0, 0),
 	{"200""000000", 0, "tvåhundramiljoner", 0, 0},
 	ORDS("200""000000", 0, "tvåhundramiljonte", 0, 0),
-	{"1000""000000", 0, "enmiljard", 0, 0},
+	CARD_DENUMS("1000""000000", 0, "enmiljard", 0, 0),
 	ORDS("1000""000000", 0, "enmiljarde", 0, 0),
 	{"2000""000000", 0, "tvåmiljarder", 0, 0},
+	DENUMS("2000""000000", 0, "tvåmiljard", 0, 0),
 	ORDS("2000""000000", 0, "tvåmiljarde", 0, 0),
 	{"20000""000000", 0, "tjugomiljarder", 0, 0},
 	{"21000""000000", 0, "tjugoenmiljarder", 0, 0},
@@ -358,7 +360,7 @@ static struct test {
 	{"1", 11 * 6, "enundeciljon", 0, 0},
 	{"1", 12 * 6, "enduodeciljon", 0, 0},
 	{"1", 13 * 6, "entredeciljon", 0, 0},
-	{"1", 14 * 6, "enkvattuordeciljon", 0, 0},
+	CARD_DENUMS("1", 14 * 6, "enkvattuordeciljon", 0, 0),
 	{"1", 15 * 6, "enkvindeciljon", 0, 0},
 	{"1", 16 * 6, "ensedeciljon", 0, 0},
 	{"1", 17 * 6, "enseptendeciljon", 0, 0},
@@ -548,7 +550,7 @@ static struct test {
 	{"1", 990 * 6, "ennonagintanongentiljon", 0, 0},
 	{"1", 999 * 6, "ennovenonagintanongentiljon", 0, 0},
 	ORDS("1", 999 * 6, "ennovenonagintanongentiljonte", 0, 0),
-	{"1000", 999 * 6, "ennovenonagintanongentiljard", 0, 0},
+	CARD_DENUMS("1000", 999 * 6, "ennovenonagintanongentiljard", 0, 0),
 	ORDS("1000", 999 * 6, "ennovenonagintanongentiljarde", 0, 0),
 	{"0", 0, "noll", F(IMPLICIT_ONE), 0},
 	{"0", 0, "nollte", F(IMPLICIT_ONE) | ORD, 0},
@@ -561,7 +563,7 @@ static struct test {
 	{"4", 0, "fyra", F(IMPLICIT_ONE), 0},
 	{"20", 0, "tjugo", F(IMPLICIT_ONE), 0},
 	{"30", 0, "trettio", F(IMPLICIT_ONE), 0},
-	{"100", 0, "hundra", F(IMPLICIT_ONE), 0},
+	CARD_DENUMS("100", 0, "hundra", F(IMPLICIT_ONE), 0),
 	{"100", 0, "hundrade", F(IMPLICIT_ONE) | ORD, 0},
 	{"101", 0, "hundraett", F(IMPLICIT_ONE), 0},
 	{"101", 0, "hundraförsta", F(IMPLICIT_ONE) | ORD, 0},
@@ -586,8 +588,9 @@ static struct test {
 	{"2""000000", 0, "tvåmiljoner", F(IMPLICIT_ONE), 0},
 	{"2""000000", 0, "tvåmiljonte", F(IMPLICIT_ONE) | ORD, 0},
 	{"100""000000", 0, "hundramiljoner", F(IMPLICIT_ONE), 0},
-	{"1000""000000", 0, "enmiljard", F(IMPLICIT_ONE), 0},
-	{"1""000000""000000", 0, "enbiljon", F(IMPLICIT_ONE), 0},
+	DENUMS("100""000000", 0, "hundramiljon", F(IMPLICIT_ONE), 0),
+	CARD_DENUMS("1000""000000", 0, "enmiljard", F(IMPLICIT_ONE), 0),
+	CARD_DENUMS("1""000000""000000", 0, "enbiljon", F(IMPLICIT_ONE), 0),
 	{"1", 4 * 6, "enkvadriljon", F(IMPLICIT_ONE), 0},
 	{"1", 100 * 6, "encentiljon", F(IMPLICIT_ONE), 0},
 	{"+0", 0, "Plus Noll", F(PASCAL_CASE), 0},
@@ -607,7 +610,7 @@ static struct test {
 	{"100", 0, "etthundra", F(LATEX_TRIPLETS), 0},
 	{"1000", 0, "etttusen", F(EXPLICIT_TRIPLETS), 0},
 	{"1000", 0, "e\"ttusen", F(LATEX_TRIPLETS), 0},
-	{"1000", 0, "tusen", F(IMPLICIT_ONE) | F(EXPLICIT_TRIPLETS), 0},
+	CARD_DENUMS("1000", 0, "tusen", F(IMPLICIT_ONE) | F(EXPLICIT_TRIPLETS), 0),
 	{"1000", 0, "tusen", F(IMPLICIT_ONE) | F(LATEX_TRIPLETS), 0},
 	{"0", 0, "noll", F(NEUTER_GENDER), 0},
 	{"0", 0, "nollte", F(NEUTER_GENDER) | ORD, 0},
