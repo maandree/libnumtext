@@ -374,6 +374,7 @@ adjust_case(struct state *state)
 	 * |   = 0x7c
 	 * ¦   = \xc2\xa6
 	 * -   = 0x2d
+	 *     = 0x20 (space)
 	 */
 	if (SENTENCE_CASE(state->flags)) {
 		p++;
