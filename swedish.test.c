@@ -16,7 +16,8 @@
 	{N, Z, E"del", (FLAGS) | DENOM, ERR},\
 	{N, Z, E"delar", (FLAGS) | DENOM | F(PLURAL_FORM), ERR},\
 	{N, Z, E"delen", (FLAGS) | DENOM | F(DEFINITE_FORM), ERR},\
-	{N, Z, E"delarna", (FLAGS) | DENOM | F(PLURAL_FORM) | F(DEFINITE_FORM), ERR}
+	{N, Z, E"delarna", (FLAGS) | DENOM | F(PLURAL_FORM) | F(DEFINITE_FORM), ERR},\
+	{N, Z, E"delte", (FLAGS) | DENOM | ORD, ERR}
 
 #define DENOMS(N, Z, E, FLAGS, ERR)\
 	DENOMS_(N, Z, E, (FLAGS) | F(COMMON_GENDER), ERR),\
@@ -81,6 +82,10 @@ static struct test {
 	ANY_GENDER("1", 0, "hela", DENOM | F(PLURAL_FORM), 0),
 	ANY_GENDER("1", 0, "helan", DENOM | F(DEFINITE_FORM), 0),
 	ANY_GENDER("1", 0, "helorna", DENOM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0),
+	ANY_GENDER("1", 0, "helte", DENOM | ORD, 0),
+	ANY_GENDER("1", 0, "helte", DENOM | ORD | F(PLURAL_FORM), 0),
+	ANY_GENDER("1", 0, "helte", DENOM | ORD | F(DEFINITE_FORM), 0),
+	ANY_GENDER("1", 0, "helte", DENOM | ORD | F(PLURAL_FORM) | F(DEFINITE_FORM), 0),
 	{"2", 0, "två", 0, 0},
 	{"+2", 0, "plus två", 0, 0},
 	{"-2", 0, "minus två", 0, 0},
@@ -93,6 +98,10 @@ static struct test {
 	ANY_GENDER("2", 0, "halvor", DENOM | F(PLURAL_FORM), 0),
 	ANY_GENDER("2", 0, "halvan", DENOM | F(DEFINITE_FORM), 0),
 	ANY_GENDER("2", 0, "halvorna", DENOM | F(PLURAL_FORM) | F(DEFINITE_FORM), 0),
+	ANY_GENDER("2", 0, "halfte", DENOM | ORD, 0),
+	ANY_GENDER("2", 0, "halfte", DENOM | ORD | F(PLURAL_FORM), 0),
+	ANY_GENDER("2", 0, "halfte", DENOM | ORD | F(DEFINITE_FORM), 0),
+	ANY_GENDER("2", 0, "halfte", DENOM | ORD | F(PLURAL_FORM) | F(DEFINITE_FORM), 0),
 	{"3", 0, "tre", 0, 0},
 	{"+3", 0, "plus tre", 0, 0},
 	{"-3", 0, "minus tre", 0, 0},
@@ -832,8 +841,6 @@ main(void)
 		fprintf(stderr, "\tFlags:    0x%08x\n", t->flags);
 		failures += 1;
 	}
-
-	/* TODO test DENOM | ORD */
 
 	if (failures > 0) {
 		fprintf(stderr, "Failure count: %zu\n", failures);
