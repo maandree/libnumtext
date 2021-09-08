@@ -13,6 +13,11 @@ libnumtext_remove_separators(char *outbuf, size_t outbuf_size, const char *num, 
 	case LIBNUMTEXT_SWEDISH:
 		for (; num_len--; num++) {
 			if (*num != ' ' && *num != '\'' && *num != '.') {
+				if (IS_UNICODE_NBSP(num, num_len)) {
+					num = &num[sizeof(UNICODE_NBSP) - 2];
+					num_len -= sizeof(UNICODE_NBSP) - 2;
+					continue;
+				}
 				if (outbuf_size) {
 					*p++ = *num;
 					outbuf_size--;

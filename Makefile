@@ -38,7 +38,7 @@ TEST_OBJ =\
 all: libnumtext.a libnumtext.$(LIBEXT)
 $(OBJ): $(HDR)
 $(LOBJ): $(HDR)
-$(TEST_OBJ): libnumtext.h
+$(TEST_OBJ): $(HDR)
 $(TEST): libnumtext.a
 
 .c.o:

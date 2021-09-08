@@ -14,13 +14,11 @@ libnumtext_num2text(char *outbuf, size_t outbuf_size, const char *num, size_t nu
 	params.trailing_zeroes = 0;
 
 	i = 0;
-	if (i < num_len) {
-		if (num[i] == '+' || num[i] == '-') {
+	if (num_len) {
+		if (num[0] == '+' || num[0] == '-')
 			i += 1;
-		} else if (num_len >= sizeof(UNICODE_MINUS)) {
-			if (!strncmp(&num[0], UNICODE_MINUS, sizeof(UNICODE_MINUS) - 1))
-				i += sizeof(UNICODE_MINUS) - 1;
-		}
+		else if (IS_UNICODE_MINUS(num, num_len))
+			i += sizeof(UNICODE_MINUS) - 1;
 	}
 	params.sign_length = i;
 	if (i == num_len)
