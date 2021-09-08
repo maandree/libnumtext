@@ -21,6 +21,12 @@
 # define FALL_THROUGH
 #endif
 
+#if defined(__GNUC__)
+# define PURE __attribute__((pure))
+#else
+# define PURE
+#endif
+
 
 #define UNICODE_MINUS "−"
 

@@ -2,6 +2,11 @@
 #include "common.h"
 
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wunused-macros"
+#endif
+
 #define TYPE_INDEX(F)            (ORDINAL(F) | DENOMINATOR(F))
 #define FORM_INDEX(F)            ((PLURAL_FORM(F) | DEFINITE_FORM(F)) / LIBNUMTEXT_N2T_SWEDISH_PLURAL_FORM)
 
@@ -48,6 +53,10 @@
 #define X_INVALID_TRIPLETS(F)    (TRIPLETS(F) > LIBNUMTEXT_N2T_SWEDISH_LATEX_TRIPLETS)
 
 #define INVALID_BITS(F)          ((F) & (uint32_t)~UINT32_C(0x00003FFF))
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 
 static struct digit {
@@ -279,7 +288,7 @@ append_thousands(struct state *state, int ten_thousands, int one_thousands)
 }
 
 
-static char
+PURE static char
 get_common_affix(const char *suffixes, const char *prefixes)
 {
 	const char *s, *p;
