@@ -37,7 +37,7 @@ enum libnumtext_language {
 #define LIBNUMTEXT_N2T_SWEDISH_HYPHENATED            UINT32_C(0x00000080) /* …, femhundra-trettio-två, … */
 
 #define LIBNUMTEXT_N2T_SWEDISH_LOWER_CASE            UINT32_C(0)          /* …, femhundratrettiotvå, … */
-#define LIBNUMTEXT_N2T_SWEDISH_PASCAL_CASE           UINT32_C(0x00000100) /* …, FemhundraTrettioTvå, … */
+#define LIBNUMTEXT_N2T_SWEDISH_MONEY_CASE            UINT32_C(0x00000100) /* …, FemhundraTrettioTvå, … */
 #define LIBNUMTEXT_N2T_SWEDISH_UPPER_CASE            UINT32_C(0x00000200) /* …, FEMHUNDRATRETTIOTVÅ, … */
 #define LIBNUMTEXT_N2T_SWEDISH_SENTENCE_CASE         UINT32_C(0x00000300) /* …, Femhundratrettiotvå, … */
 
