@@ -23,7 +23,7 @@ enum libnumtext_language {
 #define LIBNUMTEXT_N2T_SWEDISH_PLURAL_FORM           UINT32_C(0x00000004) /* hela, halvor, tredjedelar, … [2] */
 
 #define LIBNUMTEXT_N2T_SWEDISH_INDEFINITE_FORM       UINT32_C(0)
-#define LIBNUMTEXT_N2T_SWEDISH_DEFINITE_FORM         UINT32_C(0x00000008) /* helan, halvan, tredjelen, … [2] */
+#define LIBNUMTEXT_N2T_SWEDISH_DEFINITE_FORM         UINT32_C(0x00000008) /* helan, halvan, tredjedelen, … [2] */
 
 #define LIBNUMTEXT_N2T_SWEDISH_COMMON_GENDER         UINT32_C(0x00000000) /* ett/första, två/andra, … */
 #define LIBNUMTEXT_N2T_SWEDISH_NEUTER_GENDER         UINT32_C(0x00000010) /* en/första, två/andra, … */
