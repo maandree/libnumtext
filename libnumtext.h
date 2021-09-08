@@ -51,10 +51,10 @@ enum libnumtext_language {
 #define LIBNUMTEXT_N2T_SWEDISH_LATEX_TRIPLETS        UINT32_C(0x00002000) /* …, e"ttusen, … (for use in LaTeX) */
 
 /* [1] If used, also use LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE, otherwise the Swedish becomes odd, and arguably incorrect */
-/* [2] Requires LIBNUMTEXT_N2T_SWEDISH_ORDINAL (no effect) or LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR  */
+/* [2] Requires LIBNUMTEXT_N2T_SWEDISH_ORDINAL (no effect) or LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR */
 
 
-/* input to libnumtext_num2str may not contain separators */
+/* input to libnumtext_num2text may not contain separators */
 ssize_t libnumtext_remove_separators(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                                      enum libnumtext_language lang);
 
