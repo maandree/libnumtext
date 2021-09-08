@@ -31,10 +31,10 @@ enum libnumtext_language {
 #define LIBNUMTEXT_N2T_SWEDISH_FEMININE_GENDER       UINT32_C(0x00000030) /* en/första, två/andra, … */
 
 #define LIBNUMTEXT_N2T_SWEDISH_EXPLICIT_ONE          UINT32_C(0x00000000) /* …, ettusen, … */
-#define LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE          UINT32_C(0x00000040) /* …, tusen, … */
+#define LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE          UINT32_C(0x00000040) /* …, tusen, … (informal unless used with DENOMINATOR) */
 
 #define LIBNUMTEXT_N2T_SWEDISH_NOT_HYPHENATED        UINT32_C(0)
-#define LIBNUMTEXT_N2T_SWEDISH_HYPHENATED            UINT32_C(0x00000080) /* …, femhundra-trettio-två, … */
+#define LIBNUMTEXT_N2T_SWEDISH_HYPHENATED            UINT32_C(0x00000080) /* …, femhundra-trettio-två, … (avoid) */
 
 #define LIBNUMTEXT_N2T_SWEDISH_LOWER_CASE            UINT32_C(0)          /* …, femhundratrettiotvå, … */
 #define LIBNUMTEXT_N2T_SWEDISH_MONEY_CASE            UINT32_C(0x00000100) /* …, FemhundraTrettioTvå, … */

@@ -1,4 +1,4 @@
-Add [libnumtext_]text2num: text to digits, with analysis (possible flags from num2text)
+Add [libnumtext_]text2num: text to numerals, with analysis (possible flags from num2text), use support mixed in numerals
 Add [libnumtext_]card2ord: convert cardinal in digits to ordinal in digits with necessary text (like superiors in English)
 Add num2text: conversion utility that wraps libnumtext_num2text
 Add numtext-strip: utility that wraps libnumtext_remove_separators
