@@ -3,3 +3,6 @@ Add [libnumtext_]card2ord: convert cardinal in digits to ordinal in digits with 
 Add num2text: conversion utility that wraps libnumtext_num2text
 Add numtext-strip: utility that wraps libnumtext_remove_separators
 Add man pages and README
+Add IPA output support?
+Add support for decimal points?
+Add support for years, decades, centuries, and millennia?
