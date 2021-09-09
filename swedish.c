@@ -552,3 +552,101 @@ einval:
 	errno = EINVAL;
 	return -1;
 }
+
+#undef TYPE_INDEX
+#undef FORM_INDEX
+#undef CARDINAL
+#undef ORDINAL
+#undef NUMERATOR
+#undef DENOMINATOR
+#undef SINGULAR_FORM
+#undef PLURAL_FORM
+#undef INDEFINITE_FORM
+#undef DEFINITE_FORM
+#undef GENDER
+#undef COMMON_GENDER
+#undef NEUTER_GENDER
+#undef MASCULINE_GENDER
+#undef FEMININE_GENDER
+#undef EXPLICIT_ONE
+#undef IMPLICIT_ONE
+#undef NOT_HYPHENATED
+#undef HYPHENATED
+#undef CASE
+#undef LOWER_CASE
+#undef PASCAL_CASE
+#undef UPPER_CASE
+#undef SENTENCE_CASE
+#undef HYPHENATION
+#undef NO_HYPHENATION
+#undef COMPONENT_HYPHENATION
+#undef SYLLABLE_HYPHENATION
+#undef SECONDARY_HYPHENATION
+#undef TRIPLETS
+#undef REDUCED_TRIPLETS
+#undef EXPLICIT_TRIPLETS
+#undef LATEX_TRIPLETS
+#undef X_INVALID_TRIPLETS
+#undef INVALID_BITS
+
+
+
+#define GENDER(F)                ((F) & UINT32_C(0x00000003))
+#define MASCULINE_GENDER(F)      (GENDER(F) == LIBNUMTEXT_C2O_SWEDISH_MASCULINE_GENDER)
+#define UPPER_CASE(F)            ((F) & LIBNUMTEXT_C2O_SWEDISH_UPPER_CASE)
+#define INVALID_BITS(F)          ((F) & (uint32_t)~UINT32_C(0x00000007))
+
+ssize_t
+libnumtext_card2ord_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags)
+{
+	size_t i = 0, length = 0;
+	char last_digit;
+
+	if (INVALID_BITS(flags))
+		goto einval;
+
+	if (num_len) {
+		if (num[0] == '+' || num[0] == '-')
+			i += 1;
+		else if (IS_UNICODE_MINUS(num, num_len))
+			i += sizeof(UNICODE_MINUS) - 1;
+	}
+
+	while (i < num_len) {
+		if (isdigit(num[i]))
+			length = i += 1;
+		else if (IS_UNICODE_NBSP(&num[i], num_len - i))
+			i += sizeof(UNICODE_NBSP) - 1;
+		else if (num[i] != ' ' && num[i] != '\'' && num[i] != '.')
+			goto einval;
+	}
+
+	if (!length)
+		goto einval;
+
+	last_digit = num[length - 1];
+
+	memcpy(outbuf, num, length < outbuf_size ? length : outbuf_size);
+	if (length < outbuf_size)
+		outbuf[length] = ':';
+	length += 1;
+
+	if (length < outbuf_size) {
+		if (MASCULINE_GENDER(flags) || last_digit == '0' || last_digit > '2')
+			outbuf[length] = UPPER_CASE(flags) ? 'E' : 'e';
+		else
+			outbuf[length] = UPPER_CASE(flags) ? 'A' : 'a';
+	}
+	length += 1;
+
+	return (ssize_t)length;
+
+einval:
+	errno = EINVAL;
+	return -1;
+}
+
+#undef GENDER
+#undef MASCULINE_GENDER
+#undef UPPER_CASE
+#undef INVALID_BITS

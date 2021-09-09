@@ -17,6 +17,7 @@ LANG =\
 	swedish
 
 OBJ =\
+	libnumtext_card2ord.o\
 	libnumtext_num2text.o\
 	libnumtext_remove_separators.o\
 	$(LANG:=.o)

@@ -49,13 +49,15 @@
 	{N, Z, E, (FLAGS) | F(MASCULINE_GENDER), ERR},\
 	{N, Z, E, (FLAGS) | F(FEMININE_GENDER), ERR}
 
-static struct test {
+struct test {
 	const char *num;
 	size_t zeroes;
 	const char *expect;
 	uint32_t flags;
 	int errnum;
-} tests[] = {
+};
+
+static struct test n2t_tests[] = {
 	{"0", 0, "noll", 0, 0},
 	{"00", 0, "noll", 0, 0},
 	{"00000000", 0, "noll", 0, 0},
@@ -757,8 +759,10 @@ static struct test {
 	{"+-0", 0, NULL, 0, EINVAL},
 	{"x0", 0, NULL, 0, EINVAL},
 	{"0x", 0, NULL, 0, EINVAL},
-	{"0x0", 0, NULL, 0, EINVAL},
+	{"0x0", 0, NULL, 0, EINVAL}
 };
+
+/* TODO test libnumtext_card2ord */
 
 
 int
@@ -770,9 +774,9 @@ main(void)
 	size_t i, j, z, numlen, failures = 0;
 	struct test *t;
 
-	for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
+	for (i = 0; i < sizeof(n2t_tests) / sizeof(*n2t_tests); i++) {
 		j = i + 1;
-		t = &tests[i];
+		t = &n2t_tests[i];
 		numlen = strlen(t->num);
 		memcpy(numbuf, t->num, numlen);
 		for (z = 0; z < t->zeroes; z++)

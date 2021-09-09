@@ -1,7 +1,8 @@
 Add [libnumtext_]text2num: text to numerals, with analysis (possible flags from num2text), use support mixed in numerals
-Add [libnumtext_]card2ord: convert cardinal in digits to ordinal in digits with necessary text (like superiors in English)
+Add card2ord: conversion utility that wraps libnumtext_card2ord
 Add num2text: conversion utility that wraps libnumtext_num2text
 Add numtext-strip: utility that wraps libnumtext_remove_separators
+Add opposite of libnumtext_remove_separators and numtext-strip
 Add man pages and README
 Add IPA output support?
 Add support for decimal points?

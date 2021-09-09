@@ -49,3 +49,4 @@ struct common_num2text_params {
 
 
 ssize_t libnumtext_num2text_swedish__(struct common_num2text_params *params, const char *num, size_t num_len, uint32_t flags);
+ssize_t libnumtext_card2ord_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags);

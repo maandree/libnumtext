@@ -53,12 +53,23 @@ enum libnumtext_language {
 /* [1] If used, also use LIBNUMTEXT_N2T_SWEDISH_IMPLICIT_ONE, otherwise the Swedish becomes odd, and arguably incorrect */
 /* [2] Requires LIBNUMTEXT_N2T_SWEDISH_ORDINAL (no effect) or LIBNUMTEXT_N2T_SWEDISH_DENOMINATOR */
 
+#define LIBNUMTEXT_C2O_SWEDISH_COMMON_GENDER         UINT32_C(0x00000000) /* 1:a, 2:a, 3:e, … */
+#define LIBNUMTEXT_C2O_SWEDISH_NEUTER_GENDER         UINT32_C(0x00000001) /* 1:a, 2:a, 3:e, … */
+#define LIBNUMTEXT_C2O_SWEDISH_MASCULINE_GENDER      UINT32_C(0x00000002) /* 1:e, 2:e, 3:e, … */
+#define LIBNUMTEXT_C2O_SWEDISH_FEMININE_GENDER       UINT32_C(0x00000003) /* 1:a, 2:a, 3:e, … */
+
+#define LIBNUMTEXT_C2O_SWEDISH_LOWER_CASE            UINT32_C(0)          /* 1:a, 2:a, 3:e, … */
+#define LIBNUMTEXT_C2O_SWEDISH_UPPER_CASE            UINT32_C(0x00000004) /* 1:A, 2:A, 3:E, … */
+
 
 /* input to libnumtext_num2text may not contain separators */
 ssize_t libnumtext_remove_separators(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                                      enum libnumtext_language lang);
 
 ssize_t libnumtext_num2text(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
+                            enum libnumtext_language lang, uint32_t flags, ...);
+
+ssize_t libnumtext_card2ord(char *outbuf, size_t outbuf_size, const char *num, size_t num_len,
                             enum libnumtext_language lang, uint32_t flags, ...);
 
 
