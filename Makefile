@@ -16,14 +16,14 @@ LIB_VERSION = $(LIB_MAJOR).$(LIB_MINOR)
 LANG =\
 	swedish
 
-OBJ =\
+CMD =\
+	numtext-strip
+
+LIB_OBJ =\
 	libnumtext_card2ord.o\
 	libnumtext_num2text.o\
 	libnumtext_remove_separators.o\
 	$(LANG:=.o)
-
-LOBJ =\
-	$(OBJ:.o=.lo)
 
 HDR =\
 	libnumtext.h\
@@ -32,15 +32,21 @@ HDR =\
 TEST =\
 	$(LANG:=.test)
 
-TEST_OBJ =\
-	$(TEST:=.o)
+OBJ      = $(LIB_OBJ) $(CMD_OBJ)
+LOBJ     = $(LIB_LOBJ)
+CMD_OBJ  = $(CMD:=.o)
+LIB_LOBJ = $(LIB_OBJ:.o=.lo)
+TEST_OBJ = $(TEST:=.o)
 
 
-all: libnumtext.a libnumtext.$(LIBEXT)
+all: libnumtext.a libnumtext.$(LIBEXT) $(CMD)
 $(OBJ): $(HDR)
 $(LOBJ): $(HDR)
 $(TEST_OBJ): $(HDR)
 $(TEST): libnumtext.a
+
+.o:
+	$(CC) -o $@ $< libnumtext.a $(LDFLAGS)
 
 .c.o:
 	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
@@ -51,12 +57,12 @@ $(TEST): libnumtext.a
 .test.o.test:
 	$(CC) -o $@ $< libnumtext.a $(LDFLAGS)
 
-libnumtext.a: $(OBJ)
+libnumtext.a: $(LIB_OBJ)
 	@rm -f -- $@
-	$(AR) rc $@ $(OBJ)
+	$(AR) rc $@ $(LIB_OBJ)
 
-libnumtext.$(LIBEXT): $(LOBJ)
-	$(CC) $(LIBFLAGS) -o $@ $(LOBJ) $(LDFLAGS)
+libnumtext.$(LIBEXT): $(LIB_LOBJ)
+	$(CC) $(LIBFLAGS) -o $@ $(LIB_LOBJ) $(LDFLAGS)
 
 check: $(TEST)
 	@set -e &&\
@@ -79,7 +85,7 @@ uninstall:
 	-rm -f -- "$(DESTDIR)$(PREFIX)/include/libnumtext.h"
 
 clean:
-	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda *.test *.dylib
+	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda *.test *.dylib $(CMD)
 
 .SUFFIXES:
 .SUFFIXES: .lo .o .c .test .test.o
