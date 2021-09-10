@@ -12,7 +12,4 @@
 *.gcda
 *.test
 *.dylib
-/numtext-strip
-/num2text
-/text2num
-/card2ord
+/numtext

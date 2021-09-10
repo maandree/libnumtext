@@ -49,5 +49,11 @@ struct common_num2text_params {
 };
 
 
+int run(int argc, char *argv[], ssize_t (*callback)(char *outbuf, size_t outbuf_size, const char *num, size_t num_len));
+int get_language(const char *arg, enum libnumtext_language *langp, int *have_langp);
+
+int numtext_strip_main(int argc, char *argv[]);
+
+
 ssize_t libnumtext_num2text_swedish__(struct common_num2text_params *params, const char *num, size_t num_len, uint32_t flags);
 ssize_t libnumtext_card2ord_swedish__(char *outbuf, size_t outbuf_size, const char *num, size_t num_len, uint32_t flags);

@@ -1,5 +1,6 @@
-PREFIX    = /usr
-MANPREFIX = $(PREFIX)/share/man
+PREFIX     = /usr
+MANPREFIX  = $(PREFIX)/share/man
+LIBEXEC    = libexec
 
 CC = cc
 

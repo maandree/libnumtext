@@ -39,14 +39,11 @@ LIB_LOBJ = $(LIB_OBJ:.o=.lo)
 TEST_OBJ = $(TEST:=.o)
 
 
-all: libnumtext.a libnumtext.$(LIBEXT) $(CMD)
+all: libnumtext.a libnumtext.$(LIBEXT) numtext
 $(OBJ): $(HDR)
 $(LOBJ): $(HDR)
 $(TEST_OBJ): $(HDR)
 $(TEST): libnumtext.a
-
-.o:
-	$(CC) -o $@ $< libnumtext.a $(LDFLAGS)
 
 .c.o:
 	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
@@ -56,6 +53,9 @@ $(TEST): libnumtext.a
 
 .test.o.test:
 	$(CC) -o $@ $< libnumtext.a $(LDFLAGS)
+
+numtext: numtext.o $(CMD_OBJ)
+	$(CC) -o $@ $@.o $(CMD_OBJ) libnumtext.a $(LDFLAGS)
 
 libnumtext.a: $(LIB_OBJ)
 	@rm -f -- $@
@@ -71,21 +71,29 @@ check: $(TEST)
 		"./$$t" || exit 1;\
 	done
 
-install: libnumtext.a libnumtext.$(LIBEXT)
+install: libnumtext.a libnumtext.$(LIBEXT) numtext
 	mkdir -p -- "$(DESTDIR)$(PREFIX)/lib"
 	mkdir -p -- "$(DESTDIR)$(PREFIX)/include"
+	mkdir -p -- "$(DESTDIR)$(PREFIX)/bin"
+	mkdir -p -- "$(DESTDIR)$(PREFIX)/$(LIBEXEC)"
 	cp -- libnumtext.a "$(DESTDIR)$(PREFIX)/lib/"
 	cp -- libnumtext.$(LIBEXT) "$(DESTDIR)$(PREFIX)/lib/libnumtext.$(LIBMINOREXT)"
 	ln -sf -- libnumtext.$(LIBMINOREXT) "$(DESTDIR)$(PREFIX)/lib/libnumtext.$(LIBMAJOREXT)"
 	ln -sf -- libnumtext.$(LIBMINOREXT) "$(DESTDIR)$(PREFIX)/lib/libnumtext.$(LIBEXT)"
 	cp -- libnumtext.h "$(DESTDIR)$(PREFIX)/include/"
+	cp -- numtext "$(DESTDIR)$(PREFIX)/$(LIBEXEC)/"
+	set -e && for cmd in $(CMD); do\
+		ln -sf -- "../$(LIBEXEC)/numtext" "$(DESTDIR)$(PREFIX)/bin/$$cmd" || exit 1;\
+	done
 
 uninstall:
 	-rm -f -- "$(DESTDIR)$(PREFIX)/lib/libnumtext".*
 	-rm -f -- "$(DESTDIR)$(PREFIX)/include/libnumtext.h"
+	-cd -- "$(DESTDIR)$(PREFIX)/bin" && rm -- $(CMD)
+	-rm -f -- "$(DESTDIR)$(PREFIX)/$(LIBEXEC)/numtext"
 
 clean:
-	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda *.test *.dylib $(CMD)
+	-rm -f -- *.o *.a *.lo *.su *.so *.so.* *.gch *.gcov *.gcno *.gcda *.test *.dylib numtext
 
 .SUFFIXES:
 .SUFFIXES: .lo .o .c .test .test.o
