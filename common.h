@@ -49,10 +49,20 @@ struct common_num2text_params {
 };
 
 
+struct option {
+	const char *option_pattern;
+	const char *option;
+	uint32_t flag;
+	uint32_t mask;
+};
+
+
 int run(int argc, char *argv[], ssize_t (*callback)(char *outbuf, size_t outbuf_size, const char *num, size_t num_len));
 int get_language(const char *arg, enum libnumtext_language *langp, int *have_langp);
+void process_options(char **optss, size_t n_optss, struct option *options, uint32_t *flagsp, uint32_t *maskedp);
 
 int numtext_strip_main(int argc, char *argv[]);
+int card2ord_main(int argc, char *argv[]);
 
 
 ssize_t libnumtext_num2text_swedish__(struct common_num2text_params *params, const char *num, size_t num_len, uint32_t flags);

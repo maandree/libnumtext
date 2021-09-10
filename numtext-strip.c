@@ -3,7 +3,7 @@
 #include "common.h"
 #include <libsimple-arg.h>
 
-USAGE("-l language");
+USAGE("-l language [number ...]");
 
 
 static enum libnumtext_language lang;

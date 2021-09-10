@@ -17,6 +17,7 @@ LANG =\
 	swedish
 
 CMD =\
+	card2ord\
 	numtext-strip
 
 LIB_OBJ =\

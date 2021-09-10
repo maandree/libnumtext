@@ -639,6 +639,10 @@ libnumtext_card2ord_swedish__(char *outbuf, size_t outbuf_size, const char *num,
 	}
 	length += 1;
 
+	if (outbuf_size)
+		outbuf[length < outbuf_size ? length : outbuf_size] = '\0';
+	length += 1;
+
 	return (ssize_t)length;
 
 einval:

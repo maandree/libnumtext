@@ -13,8 +13,13 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (!strcmp(argv[0], "numtext-strip"))
+	argv0 = strrchr(argv[0], '/');
+	argv0 = argv0 ? &argv0[1] : argv[0];
+
+	if (!strcmp(argv0, "numtext-strip"))
 		return numtext_strip_main(argc, argv);
+	else if (!strcmp(argv0, "card2ord"))
+		return card2ord_main(argc, argv);
 
 	fprintf(stderr, "%s: not a recognised command for numtext multicall binary\n", argv[0]);
 	return 1;
@@ -120,10 +125,9 @@ get_language(const char *arg, enum libnumtext_language *langp, int *have_langp)
 	*have_langp = 1;
 
 	if (!strcmp(arg, "?")) {
-		for (i = 0; i < sizeof(languages) / sizeof(*languages); i++) {
-			printf("Languages:\n");
+		printf("Languages:\n");
+		for (i = 0; i < sizeof(languages) / sizeof(*languages); i++)
 			printf("\t%s %s\n", languages[i].code, languages[i].name);
-		}
 		exit(0);
 	} else {
 		for (i = 0; i < sizeof(languages) / sizeof(*languages); i++) {
@@ -134,5 +138,61 @@ get_language(const char *arg, enum libnumtext_language *langp, int *have_langp)
 		}
 		fprintf(stderr, "%s: unrecognised language, use ? to list available languages: %s\n", argv0, arg);
 		exit(1);
+	}
+}
+
+
+static char *
+process_option(char *opt, struct option *options, uint32_t *flagsp, uint32_t *maskedp)
+{
+	size_t len;
+
+	if (opt[0] == '?' && (!opt[1] || opt[1] == ',')) {
+		printf("Options:\n");
+		for (; options->option; options++)
+			if (options->option_pattern)
+				printf("\t%s\n", options->option_pattern);
+		exit(0);
+	}
+
+	for (; options->option; options++) {
+		len = strlen(options->option);
+		if (!strncmp(opt, options->option, len) && (!opt[len] || opt[len] == ',')) {
+			if (options->mask & *maskedp) {
+				fprintf(stderr, "%s: option conflicts with previously specified option: %.*s\n", argv0, (int)len, opt);
+				exit(1);
+			}
+			*flagsp |= options->flag;
+			*maskedp |= options->mask;
+			return &opt[len];
+		}
+	}
+
+	fprintf(stderr, "%s: unrecognised option for selected language, use ? to list available options: %s\n", argv0, opt);
+	exit(1);
+}
+
+void
+process_options(char **optss, size_t n_optss, struct option *options, uint32_t *flagsp, uint32_t *maskedp)
+{
+	uint32_t _masked;
+	char *opts;
+	size_t i;
+
+	if (!maskedp)
+		maskedp = &_masked;
+	*flagsp = 0;
+	*maskedp = 0;
+
+	for (i = 0; i < n_optss; i++) {
+		opts = optss[i];
+		for (;;) {
+			while (*opts == ',')
+				opts = &opts[1];
+			if (!*opts)
+				break;
+			else
+				opts = process_option(opts, options, flagsp, maskedp);
+		}
 	}
 }
