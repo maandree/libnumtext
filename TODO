@@ -1,5 +1,5 @@
 Add [libnumtext_]text2num: text to numerals, with analysis (possible flags from num2text), use support mixed in numerals
-Add opposite of libnumtext_remove_separators and numtext-strip
+Add opposite of libnumtext_remove_separators and numtext-strip (libnumtext_separate, numtext-separate)
 Add man pages and README
 Add IPA output support?
 Add support for decimal points?
