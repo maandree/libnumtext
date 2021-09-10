@@ -18,6 +18,7 @@ LANG =\
 
 CMD =\
 	card2ord\
+	num2text\
 	numtext-strip
 
 LIB_OBJ =\

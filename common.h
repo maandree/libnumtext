@@ -63,6 +63,7 @@ void process_options(char **optss, size_t n_optss, struct option *options, uint3
 
 int numtext_strip_main(int argc, char *argv[]);
 int card2ord_main(int argc, char *argv[]);
+int num2text_main(int argc, char *argv[]);
 
 
 ssize_t libnumtext_num2text_swedish__(struct common_num2text_params *params, const char *num, size_t num_len, uint32_t flags);

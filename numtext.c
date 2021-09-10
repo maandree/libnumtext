@@ -20,6 +20,8 @@ main(int argc, char *argv[])
 		return numtext_strip_main(argc, argv);
 	else if (!strcmp(argv0, "card2ord"))
 		return card2ord_main(argc, argv);
+	else if (!strcmp(argv0, "num2text"))
+		return num2text_main(argc, argv);
 
 	fprintf(stderr, "%s: not a recognised command for numtext multicall binary\n", argv[0]);
 	return 1;
@@ -145,6 +147,7 @@ get_language(const char *arg, enum libnumtext_language *langp, int *have_langp)
 static char *
 process_option(char *opt, struct option *options, uint32_t *flagsp, uint32_t *maskedp)
 {
+	uint32_t flag, mask;
 	size_t len;
 
 	if (opt[0] == '?' && (!opt[1] || opt[1] == ',')) {
@@ -158,12 +161,14 @@ process_option(char *opt, struct option *options, uint32_t *flagsp, uint32_t *ma
 	for (; options->option; options++) {
 		len = strlen(options->option);
 		if (!strncmp(opt, options->option, len) && (!opt[len] || opt[len] == ',')) {
-			if (options->mask & *maskedp) {
+			flag = options->flag;
+			mask = options->mask ? options->mask : options->flag;
+			if ((mask & *maskedp) && (*flagsp & mask) != flag) {
 				fprintf(stderr, "%s: option conflicts with previously specified option: %.*s\n", argv0, (int)len, opt);
 				exit(1);
 			}
-			*flagsp |= options->flag;
-			*maskedp |= options->mask;
+			*flagsp |= flag;
+			*maskedp |= mask;
 			return &opt[len];
 		}
 	}
