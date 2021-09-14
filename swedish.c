@@ -36,7 +36,7 @@
 
 #define CASE(F)                  ((F) & UINT32_C(0x00000300))
 #define LOWER_CASE(F)            (CASE(F) == LIBNUMTEXT_N2T_SWEDISH_LOWER_CASE)
-#define PASCAL_CASE(F)           (CASE(F) == LIBNUMTEXT_N2T_SWEDISH_PASCAL_CASE)
+#define MONEY_CASE(F)            (CASE(F) == LIBNUMTEXT_N2T_SWEDISH_MONEY_CASE)
 #define UPPER_CASE(F)            (CASE(F) == LIBNUMTEXT_N2T_SWEDISH_UPPER_CASE)
 #define SENTENCE_CASE(F)         (CASE(F) == LIBNUMTEXT_N2T_SWEDISH_SENTENCE_CASE)
 
@@ -118,7 +118,7 @@ static struct denominator_suffix {
 } denominator_suffixes = {{"||del",  "||del¦ar",  "||del¦en",  "||del¦ar¦na"},  "||del¦te"};
 
 static const char *signs[2 /* whether + */][4 /* type */] = {
-	{"Min¦us ", "Min¦us-", "Min¦us-", "Min¦us-"},
+	{"Mi¦nus ", "Mi¦nus-", "Mi¦nus-", "Mi¦nus-"},
 	{"Plus ",   "Plus-",   "Plus-",   "Plus-"}
 };
 
@@ -574,7 +574,7 @@ einval:
 #undef HYPHENATED
 #undef CASE
 #undef LOWER_CASE
-#undef PASCAL_CASE
+#undef MONEY_CASE
 #undef UPPER_CASE
 #undef SENTENCE_CASE
 #undef HYPHENATION
