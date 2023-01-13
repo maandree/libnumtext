@@ -1,6 +1,56 @@
 /* See LICENSE file for copyright and license details. */
 #include "common.h"
 
+/*
+ * There are no spaces in Swedish numbers
+ *
+ * All my life, I've seen Swedish numbers, being written out
+ * in letters, completely absent of spaces. Banks, lotteries,
+ * brokers commonly write out large numbers in letters, and
+ * all of theme write without spaces; however to make it more
+ * readable (which isn't really necessary), they do capitalise
+ * some letters: for example, I bought by appartment for
+ * “TvåmiljonerNittioFemtusen” (2095000) SEK. Actually, this
+ * capitalisation is even a bit confusing because you naturally
+ * read it as 2000000–90–5000 rather than 2000000–95000.
+ * Recently, however, I've seen a non-Swedish style guide for
+ * Swedish, that seems to have caught on, claiming that 2095000
+ * should be written as “två miljoner nittiofemtusen”. This is
+ * of follows completely different rules from the ones used to
+ * arrive at “TvåmiljonerNittioFemtusen”, and feels like German.
+ * So for some reason, this guide treats “miljon”, “miljard”,
+ * and so one as special, nounesque, numbers, and therefore
+ * thinks it should be surrounded by spaces. Looking to
+ * “Svenska Akademiens ordbok”, we see the spaceless version
+ * attested, but we also see the spaced version attested, albiet
+ * with lower numbers after “miljon”, we see that “sex miljoner”
+ * (actually it uses the older spelling for “miljoner”) attest,
+ * but nothing akin to “sex miljoner femhundratusen”. Why would
+ * “miljon” and larger numbers be treated separately from smaller
+ * numbers, especially considering that in Swedish we regularly
+ * combine words? There is only one differences between the larger
+ * numbers and the smaller numbers: “miljon” och larger numbers
+ * have distinct plural and singular from, whereas the smaller
+ * numbers do not. This of couse shouldn't matter: “5 får” is
+ * “fem får” not “femfår” (that would be something much more
+ * horrific). Something that makes the larger numbers specially
+ * is also that you can say for example “en och en halv miljon”,
+ * but you cannot say “en och en halv tio”, but you can say
+ * “en och en halv tusen”, and arguably “en och en halv hundra”,
+ * and therefore you can say ”sex miljoner”, but why then would
+ * you write “sex miljoner” but not “sex tusen”? However, you
+ * cannot write “en och en halv miljon fyrahundratusen” (probably
+ * not even “en och en halv miljon ettusen”, the would be
+ * “en och en halv och/plus miljon ettusen”. The conclusion is
+ * that 2095000 is properly written as “tvåmiljonernittiofemtusen”.
+ * But moreover, if you accept the spaced spelling: what would
+ * “en miljard fem miljondelar” mean? It would be completly
+ * ambiguous. It could be 1/1005000000, 1000000000/5000000, or
+ * 1000000005/1000000. In conclusion: the style that is coherent
+ * with the rest of Swedish, is not arbitrary, and is unambiguous
+ * it he one without any spaces.
+ */
+
 
 #if defined(__GNUC__)
 # pragma GCC diagnostic push
